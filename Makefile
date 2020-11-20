@@ -90,6 +90,6 @@ test_plot:
 
 ##########
 # clean
-.PHONY : clean
+.PHONY : clean test test_linear test_compact test_polynomial test_random test_plot
 clean:
 	-rm edit $(OBJ_FILES) test $(MAIN) $(SUBLIB)
