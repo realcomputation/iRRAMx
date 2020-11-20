@@ -10,6 +10,8 @@ POLYNOMIAL_DIR = ./src/polynomial
 RANDOM_DIR = ./src/random
 PLOT_DIR = ./src/plot
 
+LIB_DIR = ./lib
+
 LINEAR_SRC_FILES := $(wildcard $(LINEAR_DIR)/*.cpp)
 LINEAR_OBJ_FILES := $(patsubst $(LINEAR_DIR)/%.cpp,$(LINEAR_DIR)/%.o,$(LINEAR_SRC_FILES))
 
@@ -30,31 +32,34 @@ OBJ_FILES = $(LINEAR_OBJ_FILES) $(COMPACT_OBJ_FILES) $(POLYNOMIAL_OBJ_FILES) $(R
 
 
 
-MAIN = libiRRAM_extension.a # static library
+MAIN = $(LIB_DIR)/libiRRAM_extension.a # static library
 
 all: $(MAIN)
 
-$(MAIN): $(OBJ_FILES)
+$(MAIN): $(OBJ_FILES) lib
 	ar -r $(MAIN) $(OBJ_FILES)
+
+lib:
+	mkdir $(LIB_DIR)
 
 ##########
 # Sublibrary build for development
-linear: $(LINEAR_OBJ_FILES)
-	ar -r libiRRAM_linear.a $(LINEAR_OBJ_FILES)
+linear: $(LINEAR_OBJ_FILES) lib
+	ar -r $(LIB_DIR)/libiRRAM_linear.a $(LINEAR_OBJ_FILES)
 
-compact: $(COMPACT_OBJ_FILES)
-	ar -r libiRRAM_compact.a $(COMPACT_OBJ_FILES)
+compact: $(COMPACT_OBJ_FILES) lib
+	ar -r $(LIB_DIR)/libiRRAM_compact.a $(COMPACT_OBJ_FILES)
 
-polynomial: $(POLYNOMIAL_OBJ_FILES)
-	ar -r libiRRAM_polynomial.a $(POLYNOMIAL_OBJ_FILES)
+polynomial: $(POLYNOMIAL_OBJ_FILES) lib
+	ar -r $(LIB_DIR)/libiRRAM_polynomial.a $(POLYNOMIAL_OBJ_FILES)
 
-random: $(RANDOM_OBJ_FILES)
-	ar -r libiRRAM_random.a $(RANDOM_OBJ_FILES)
+random: $(RANDOM_OBJ_FILES) lib
+	ar -r $(LIB_DIR)/libiRRAM_random.a $(RANDOM_OBJ_FILES)
 
-plot: $(PLOT_OBJ_FILES)
-	ar -r libiRRAM_plot.a $(PLOT_OBJ_FILES)
+plot: $(PLOT_OBJ_FILES) lib
+	ar -r $(LIB_DIR)/libiRRAM_plot.a $(PLOT_OBJ_FILES)
 
-SUBLIB = libiRRAM_linear.a libiRRAM_compact.a libiRRAM_polynomial.a libiRRAM_random.a libiRRAM_plot.a
+ALL_LIBS = $(wildcard $(LIB_DIR)/*.a)
 
 ##########
 %.o: %.cpp
@@ -67,29 +72,29 @@ SUBLIB = libiRRAM_linear.a libiRRAM_compact.a libiRRAM_polynomial.a libiRRAM_ran
 TESTDIR = ./test
 
 test:
-	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test.cpp -L. -liRRAM_extension $(LIBS) -o $(TESTDIR)/test
+	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test.cpp -L./$(LIB_DIR) -liRRAM_extension $(LIBS) -o $(TESTDIR)/test
 
 
 ##########
 # compile test code that uses a sublibrary (for development use)
 test_linear:
-	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test_linear.cpp -L. -liRRAM_linear $(LIBS) -o $(TESTDIR)/test_linear
+	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test_linear.cpp -L./$(LIB_DIR) -liRRAM_linear $(LIBS) -o $(TESTDIR)/test_linear
 
 test_compact:
-	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test_compact.cpp -L. -liRRAM_compact $(LIBS) -o $(TESTDIR)/test_compact
+	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test_compact.cpp -L./$(LIB_DIR) -liRRAM_compact $(LIBS) -o $(TESTDIR)/test_compact
 
 test_polynomial:
-	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test_polynomial.cpp -L. -liRRAM_polynomial $(LIBS) -o $(TESTDIR)/test_polynomial
+	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test_polynomial.cpp -L./$(LIB_DIR) -liRRAM_polynomial $(LIBS) -o $(TESTDIR)/test_polynomial
 
 test_random:
-	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test_random.cpp -L. -liRRAM_random $(LIBS) -o $(TESTDIR)/test_random
+	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test_random.cpp -L./$(LIB_DIR) -liRRAM_random $(LIBS) -o $(TESTDIR)/test_random
 
 test_plot:
-	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test_plot.cpp -L. -liRRAM_plot $(LIBS) -o $(TESTDIR)/test_plot
+	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test_plot.cpp -L./$(LIB_DIR) -liRRAM_plot $(LIBS) -o $(TESTDIR)/test_plot
 
 
 ##########
 # clean
 .PHONY : clean test test_linear test_compact test_polynomial test_random test_plot
 clean:
-	-rm edit $(OBJ_FILES) test $(MAIN) $(SUBLIB)
+	-rm edit $(OBJ_FILES) $(ALL_LIBS)
