@@ -1,48 +1,95 @@
 CPPC                 = gcc
-STANDARD_FLAGS       = -std=c++14
-# WARN_AS_ERRORS_FLAGS = -pedantic-errors\
-#                        -Wall\
-#                        -Wextra\
-#                        -Werror\
-#                        -Wconversion
-# DEBUG_FLAGS          = -g3
-# OPT_FLAGS            = -0O
-# NO_LINKER_FLAGS      = -c
-
-CPPFLAGS             = -std=c++14 -O2 -Wall 
-
-# CXX = g++
-# # CXXCPP = g++ -E -std=c++11
-# CPPFLAGS = -I./include
-# CXXFLAGS = -g -O2 -std=c++14 -mpc80
-# LDFLAGS = -Xlinker -rpath -Xlinker ./lib
-# LDLIBS = -L./lib -lmpfr -lgmp -lm -lpthread -lirram -lpng 
-
-
+CPPFLAGS             = -std=c++14 -O2 -Wall
+LIBS = -liRRAM -lmpfr -lgmp
 INCLUDES = -I./include
 
-# SRCS     = ./src/compact/compact.cpp ./src/compact/compact2.cpp
 
-OBJS     = ./src/compact/compact.o
+LINEAR_DIR = ./src/linear
+COMPACT_DIR = ./src/compact
+POLYNOMIAL_DIR = ./src/polynomial
+RANDOM_DIR = ./src/random
+PLOT_DIR = ./src/plot
 
-LIBS = -lmpfr -lgmp -lm -lirram
-MAIN = libtest.a # static library
+LINEAR_SRC_FILES := $(wildcard $(LINEAR_DIR)/*.cpp)
+LINEAR_OBJ_FILES := $(patsubst $(LINEAR_DIR)/%.cpp,$(LINEAR_DIR)/%.o,$(LINEAR_SRC_FILES))
+
+COMPACT_SRC_FILES := $(wildcard $(COMPACT_DIR)/*.cpp)
+COMPACT_OBJ_FILES := $(patsubst $(COMPACT_DIR)/%.cpp,$(COMPACT_DIR)/%.o,$(COMPACT_SRC_FILES))
+
+POLYNOMIAL_SRC_FILES := $(wildcard $(POLYNOMIAL_DIR)/*.cpp)
+POLYNOMIAL_OBJ_FILES := $(patsubst $(POLYNOMIAL_DIR)/%.cpp,$(POLYNOMIAL_DIR)/%.o,$(POLYNOMIAL_SRC_FILES))
+
+RANDOM_SRC_FILES := $(wildcard $(RANDOM_DIR)/*.cpp)
+RANDOM_OBJ_FILES := $(patsubst $(RANDOM_DIR)/%.cpp,$(RANDOM_DIR)/%.o,$(RANDOM_SRC_FILES))
+
+PLOT_SRC_FILES := $(wildcard $(PLOT_DIR)/*.cpp)
+PLOT_OBJ_FILES := $(patsubst $(PLOT_DIR)/%.cpp,$(PLOT_DIR)/%.o,$(PLOT_SRC_FILES))
+
+OBJ_FILES = $(LINEAR_OBJ_FILES) $(COMPACT_OBJ_FILES) $(POLYNOMIAL_OBJ_FILES) $(RANDOM_OBJ_FILES) $(PLOT_OBJ_FILES)
 
 
-# linear:
-# 	gcc -c linear.cpp -liRRAM
+
+
+MAIN = libiRRAM_extension.a # static library
 
 all: $(MAIN)
-	@echo $(MAIN) has been compiled!
 
-$(MAIN): $(OBJS)
-	ar -r $(MAIN) $(OBJS) 
+$(MAIN): $(OBJ_FILES)
+	ar -r $(MAIN) $(OBJ_FILES)
 
+##########
+# Sublibrary build for development
+linear: $(LINEAR_OBJ_FILES)
+	ar -r libiRRAM_linear.a $(LINEAR_OBJ_FILES)
+
+compact: $(COMPACT_OBJ_FILES)
+	ar -r libiRRAM_compact.a $(COMPACT_OBJ_FILES)
+
+polynomial: $(POLYNOMIAL_OBJ_FILES)
+	ar -r libiRRAM_polynomial.a $(POLYNOMIAL_OBJ_FILES)
+
+random: $(RANDOM_OBJ_FILES)
+	ar -r libiRRAM_random.a $(RANDOM_OBJ_FILES)
+
+plot: $(PLOT_OBJ_FILES)
+	ar -r libiRRAM_plot.a $(PLOT_OBJ_FILES)
+
+SUBLIB = libiRRAM_linear.a libiRRAM_compact.a libiRRAM_polynomial.a libiRRAM_random.a libiRRAM_plot.a
+
+##########
 %.o: %.cpp
 	$(CPPC) $(INCLUDES) $(CPPFLAGS) $(LIBS) -c $< -o $@
 
+
+##########
+# run test code
+
+TESTDIR = ./test
+
 test:
-	gcc -I./include -std=c++14 -O2 -Wall -lmpfr -lgmp -lm -lirram test.cpp -o test
-	# $(CPPC) $(INCLUDES) $(CPPFLAGS) $(LIBS) -o test test.cpp
-# depend: $(SRCS)
-# 	makedepend $(INCLUDES) $^
+	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test.cpp -L. -liRRAM_extension $(LIBS) -o $(TESTDIR)/test
+
+
+##########
+# compile test code that uses a sublibrary (for development use)
+test_linear:
+	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test_linear.cpp -L. -liRRAM_linear $(LIBS) -o $(TESTDIR)/test_linear
+
+test_compact:
+	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test_compact.cpp -L. -liRRAM_compact $(LIBS) -o $(TESTDIR)/test_compact
+
+test_polynomial:
+	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test_polynomial.cpp -L. -liRRAM_polynomial $(LIBS) -o $(TESTDIR)/test_polynomial
+
+test_random:
+	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test_random.cpp -L. -liRRAM_random $(LIBS) -o $(TESTDIR)/test_random
+
+test_plot:
+	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test_plot.cpp -L. -liRRAM_plot $(LIBS) -o $(TESTDIR)/test_plot
+
+
+##########
+# clean
+.PHONY : clean
+clean:
+	-rm edit $(OBJ_FILES) test $(MAIN) $(SUBLIB)
