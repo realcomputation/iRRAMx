@@ -1,4 +1,6 @@
 // #include <iRRAM.h>
+#include <cassert>
+
 #include "iRRAM_extension/linear.hpp"
 
 using namespace iRRAM;
