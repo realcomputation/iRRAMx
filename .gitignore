@@ -1,3 +1,9 @@
 
 *.a
 *.o
+test/test
+test/test_linear
+test/test_compact
+test/test_polynomial
+test/test_random
+test/test_plot
