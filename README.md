@@ -187,3 +187,67 @@ Some header files of _polynomial_ that are used only internally can be found in 
 The C++ source codes of _polynomial_ can be found in `./src/polynomial`.
 
 New sublibraries can be freely created following the above organization. If the organizational requirement is satisfied, `make` will do every work for the compilation.
+
+
+# iRRAM
+iRRAM is a C++ library for exact real-number computation.
+Due to the lack of any up-to-date documentation for it, we put some simple note here for the beginners.
+
+## Installation
+Though the official release can be found in the [official website](http://irram.uni-trier.de),
+we (recommend to) use the recent version of it that can be found in their [github](https://github.com/norbert-mueller/iRRAM). Once the repository is cloned, run `./QUICKINSTALL_run_me`. It requires some autotools to be installed. (_please write which of those are required precisely_.)
+
+Besides of those arbitrary installation related dependencies, it requires MPFR and GMP libraries installed.
+
+If iRRAM is installed properly in the system, a cpp file using iRRAM can be compiled using the link option:
+```
+g++ -std=c++14 my_prog.cpp -liRRAM -lmpfr -lgmp
+```
+
+## How To Use
+iRRAM provides one wrapper header file `iRRAM.h` that provides every functionalities of iRRAM.
+Assuming, iRRAM is installed in the system, a default user program that uses iRRAM would look like this:
+```
+#include <iRRAM.h>
+
+void compute(){
+  ...
+}
+```
+
+### compute()
+`void compute()` is the function that replaces `main` when `iRRAM.h` is included.
+There is a reason for this. If this technical reason is not so interesting,
+this section can be skipped. Just regard `compute()` as the new `main()` and forget
+everything about `main()`.
+
+iRRAM achieves errorless computation via reiterations.
+A real number is internally represented as an interval that is implemented using MPFR + GMP.
+The idea is that when we perform interval computation repeatedly with higher and higher precision, it essentially is
+equivalent to a computation without any errors.
+
+A user will write an instruction for a computation. And, it needs to be computed repeatedly with
+increasing precision. However, if the instruction is written in `main()` function, due to the
+design of C++ language, it cannot be reiterated.
+Therefore, what iRRAM does is as follows. `iRRAM.h` has already defined
+`main` function which is designed to reiterate `compute()` function.
+
+Now, when the user define their own `compute()` function regarding it as the `main` function,
+the `main` function in `iRRAM.h` runs the `compute()` function with the additional cares: reiterate!
+
+### REAL arithmetic
+iRRAM provides a data type called REAL. It overloads the primitive operators.
+For example, the following code
+```
+iRRAM::REAL x = 42;
+iRRAM::REAL y = 20;
+iRRAM::cout << x + y
+```
+assigns the real number 42 to the variable x and 20 to the variable y.
+And, it prints x + y, which ought to be 62.
+
+The idea is that iRRAM brings exact real numbers (REAL) as a first class citizen to C++.
+
+### Partial comparison and Choose
+
+### Limit
