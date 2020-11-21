@@ -170,3 +170,15 @@ The input p is supposed to be negative.
 ### iRRAM_extension/plot.hpp
 
 ## Contributing to iRRAM_extension
+This section is for those who want to contribute to this library.
+For the purpose, we introduce the structure of this library.
+
+This library consists of multiple sublibraries. (Here, sublibrary is not a technical term.. It means header files that the users will separately include in their applications.)
+For each sublibrary, its public header file must stay in `./include/iRRAM_extension`, its header files that are used internally
+must stay in its own directory in `./include/iRRAM_extension`, and its source codes must say in its own directory in `./src`.
+
+For example, the public header file of _polynomial_ can be found in `./include/iRRAM_extension/polynomial.h`.
+Some header files of _polynomial_ that are used only internally can be found in `./include/iRRAM_extension/polynomial/`.
+The C++ source codes of _polynomial_ can be found in `./src/polynomial`.
+
+New sublibraries can be freely created following the above organization. If the organizational requirement is satisfied, `make` will do every work for the compilation.
