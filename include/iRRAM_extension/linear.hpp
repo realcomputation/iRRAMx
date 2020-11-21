@@ -9,7 +9,7 @@ using namespace iRRAM;
 namespace iRRAM{
 
 // utilities
-std::string to_string_double (const REALMATRIX M);
+std::string to_string_double (REALMATRIX M);
 
 
 // elementary ops
@@ -25,16 +25,19 @@ REALMATRIX strassen (REALMATRIX, REALMATRIX); // strassen fast multiplication
 
 
 // Decompositions
-REALMATRIX QRDecomposition(REALMATRIX X); // when X is regular
+std::pair<REALMATRIX, REALMATRIX> QR(REALMATRIX); // QR decomposition
+std::pair<REALMATRIX, REALMATRIX> QR_H(REALMATRIX); // QR decomposition for Hessenberg matrix
 
-// Hessenberg matrices
-REALMATRIX hessenberg_reduction(REALMATRIX M, int p); // reduces a matrix
-std::pair<REALMATRIX, REALMATRIX> Hessenberg_QR_decomposition(REALMATRIX H);
+
+// Reductions
+REALMATRIX hessenberg_reduction(REALMATRIX M, int p); // reduces to Hessenberg with eig perturbation 2^p
+
 
 // linear system
 // - Regular matrix:
 REALMATRIX gelim (REALMATRIX); // gaussian elimination for regular matrix
-REAL determinant(REALMATRIX M);
+REAL determinant(REALMATRIX M); // partial=
+// REAL det(REALMATRIX M);
 REALMATRIX linearSys(REALMATRIX M, REALMATRIX b);
 REALMATRIX inv(REALMATRIX M);
 

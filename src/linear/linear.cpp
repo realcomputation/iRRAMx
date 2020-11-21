@@ -479,46 +479,46 @@ std::pair<REALMATRIX, REALMATRIX> Hessenberg_QR_decomposition(REALMATRIX H)
 }
 
 // QR step
-REALMATRIX QR(REALMATRIX H)
-{
-    int n = H.maxrow;
-    REALMATRIX Q = eye(n);
-    REAL r, c, s;
-    REAL tmp1, tmp2;
-    REAL Givens[2*n-2];
-    int tmp;
-    for (int i = 0; i < n-1; i++)
-    {
-	r = sqrt(H(i,i)*H(i,i) + H(i+1, i)*H(i+1, i));
-	c = H(i,i) / r;
-	s = H(i+1,i) / r;
-	Givens[i*2] = c;
-	Givens[i*2+1] = s;
-	tmp = i + 3;
-	if(i == n-2)
-	    tmp = i + 2;
-	for(int l=i; l<tmp; l++)
-	{
-	    tmp1 = H(i,l); tmp2 = H(i+1,l);
-	    H(i,l) = tmp1*c +tmp2*s;
-	    H(i+1,l) = - tmp1*s + tmp2*c;
-	}
-    }
-
-    for (int i=0; i<n-1; i++)
-    {
-	for (int j=i-1; j<i+2; j++)
-	{
-	    if(j == -1 || j == n+1)
-		continue;
-	    tmp1 = H(j, i) * Givens[2*i] + H(j,i+1) * Givens[2*i + 1];
-	    H(j, i+1) = - H(j, i) * Givens[2*i+1] + H(j,i+1) *Givens[2*i];
-	    H(j,i) = tmp1;
-	}
-    }
-
-    return H;
-}
+// REALMATRIX QR(REALMATRIX H)
+// {
+//     int n = H.maxrow;
+//     REALMATRIX Q = eye(n);
+//     REAL r, c, s;
+//     REAL tmp1, tmp2;
+//     REAL Givens[2*n-2];
+//     int tmp;
+//     for (int i = 0; i < n-1; i++)
+//     {
+// 	r = sqrt(H(i,i)*H(i,i) + H(i+1, i)*H(i+1, i));
+// 	c = H(i,i) / r;
+// 	s = H(i+1,i) / r;
+// 	Givens[i*2] = c;
+// 	Givens[i*2+1] = s;
+// 	tmp = i + 3;
+// 	if(i == n-2)
+// 	    tmp = i + 2;
+// 	for(int l=i; l<tmp; l++)
+// 	{
+// 	    tmp1 = H(i,l); tmp2 = H(i+1,l);
+// 	    H(i,l) = tmp1*c +tmp2*s;
+// 	    H(i+1,l) = - tmp1*s + tmp2*c;
+// 	}
+//     }
+//
+//     for (int i=0; i<n-1; i++)
+//     {
+// 	for (int j=i-1; j<i+2; j++)
+// 	{
+// 	    if(j == -1 || j == n+1)
+// 		continue;
+// 	    tmp1 = H(j, i) * Givens[2*i] + H(j,i+1) * Givens[2*i + 1];
+// 	    H(j, i+1) = - H(j, i) * Givens[2*i+1] + H(j,i+1) *Givens[2*i];
+// 	    H(j,i) = tmp1;
+// 	}
+//     }
+//
+//     return H;
+// }
 
 
 int sign(REAL x, REAL p)
@@ -1179,4 +1179,74 @@ REALMATRIX gelim(REALMATRIX A)
 {
   return gelim(A, A.maxrow);
 }
+
+REAL Enorm(REALMATRIX M){
+  REAL sum = 0;
+  for (unsigned int i = 0; i<M.maxrow; i++)
+    for (unsigned int j = 0; j<M.maxcolumn; i++)
+      sum = sum + M(i, j) * M(i, j);
+  sum = sqrt(sum);
+  return sum;
+}
+
+// householder reflector
+REALMATRIX Householder(REALMATRIX u){
+//u is a column vector
+  REALMATRIX X(u.maxrow, u.maxrow);
+  for(unsigned int i = 0; i < u.maxrow; i++)
+    for(unsigned int j = 0; j < u.maxrow; j++)
+      if (i == j)
+        X(i, j) = 1 - 2 * u(i, 0) * u(j, 0);
+      else
+        X(i, j) = - 2 * u(i, 0) * u(j, 0);
+  return X;
+}
+
+REALMATRIX normalize(REALMATRIX u){
+  REALMATRIX X(u.maxrow, 1);
+  REAL sum = 0;
+  for (unsigned int i = 0; i<u.maxrow; i++)
+    sum = sum + abs(u(i, 0) * u(i, 0));
+  sum = sqrt(sum);
+  for (unsigned int i = 0; i<u.maxrow; i++)
+    X(i, 0) = u(i, 0) / sum;
+  return X;
+}
+
+std::pair<REALMATRIX, REALMATRIX> QR (REALMATRIX M){
+
+  std::vector<REALMATRIX> reflectors;
+  REALMATRIX A = M;
+  for (unsigned int i = 0; i < A.maxcolumn; i ++ ){
+    REALMATRIX y(A.maxrow, 1);
+    REALMATRIX e(A.maxrow, 1);
+    for(unsigned int j = 0; j < A.maxcolumn; j ++){
+      if(j<i)
+        y(j,0) = 0;
+      else
+        y(j,0) = A(j, i);
+      if(i==j)
+        e(j,0) = 1;
+      else
+        e(j,0) = 0;
+    }
+    REALMATRIX H = Householder(normalize(y - Enorm(y) * e));
+    reflectors.push_back(H);
+    A = H * A;
+  }
+  REALMATRIX H = reflectors[0];
+  for(int i =1; i<reflectors.size(); i++)
+    H = H * reflectors[i];
+
+  return std::make_pair(H, A);
+}
+
+std::pair<REALMATRIX, REALMATRIX> QR_H(REALMATRIX H){
+  return Hessenberg_QR_decomposition(H);
+}
+
+
+
+
+
 }
