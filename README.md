@@ -110,6 +110,11 @@ The input p is supposed to be negative.
 
 > **returns** M : REALMATRIX which is the multiplicative inverse X. ***This is partially defined***
 
+- `REAL det_approx(REALMATRIX M, int p)`
+
+> **returns** det : REAL which is 2^p approximation to the determinant of a square matrix M. (uses Hadamard bound and
+Gaussian algorithm)
+
 - `REALMATRIX kernel(REALMATRIX X, int k)`
 
 > **returns** C : REALMATRIX which consists of k orthogonal column vectors which span the k dimensional kernel of X.
