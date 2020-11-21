@@ -3,15 +3,58 @@ CPPFLAGS             = -std=c++14 -O2 -Wall
 LIBS = -liRRAM -lmpfr -lgmp
 INCLUDES = -I./include
 
+##########
+# path to the library directory
+LIB_DIR = ./lib
 
+#########
+# all cpp files
+SRC_CPP_FILES := $(wildcard ./src/*/*.cpp)
+SRC_OBJ_FILES := $(subst .cpp,.o,$(SRC_CPP_FILES))
+
+##########
+# target is the library file
+MAIN = $(LIB_DIR)/libiRRAM_extension.a
+
+all: $(MAIN)
+
+$(MAIN): $(SRC_OBJ_FILES) lib
+	ar -r $(MAIN) $(SRC_OBJ_FILES)
+
+##########
+# create ./lib if it does not exist
+lib:
+	mkdir $(LIB_DIR)
+
+
+##########
+%.o: %.cpp
+	$(CPPC) $(INCLUDES) $(CPPFLAGS)  -c $< -o $@
+
+
+##########
+# run test code
+
+TESTDIR = ./test
+
+test:
+	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test.cpp -L./$(LIB_DIR) -liRRAM_extension $(LIBS) -o $(TESTDIR)/test
+
+
+
+#########
+# development purpose: create independent sub-library
+
+##########
+# paths to the source dirs of the sublibraries
 LINEAR_DIR = ./src/linear
 COMPACT_DIR = ./src/compact
 POLYNOMIAL_DIR = ./src/polynomial
 RANDOM_DIR = ./src/random
 PLOT_DIR = ./src/plot
 
-LIB_DIR = ./lib
-
+##########
+# source and object files of each sublibrary
 LINEAR_SRC_FILES := $(wildcard $(LINEAR_DIR)/*.cpp)
 LINEAR_OBJ_FILES := $(patsubst $(LINEAR_DIR)/%.cpp,$(LINEAR_DIR)/%.o,$(LINEAR_SRC_FILES))
 
@@ -26,21 +69,6 @@ RANDOM_OBJ_FILES := $(patsubst $(RANDOM_DIR)/%.cpp,$(RANDOM_DIR)/%.o,$(RANDOM_SR
 
 PLOT_SRC_FILES := $(wildcard $(PLOT_DIR)/*.cpp)
 PLOT_OBJ_FILES := $(patsubst $(PLOT_DIR)/%.cpp,$(PLOT_DIR)/%.o,$(PLOT_SRC_FILES))
-
-OBJ_FILES = $(LINEAR_OBJ_FILES) $(COMPACT_OBJ_FILES) $(POLYNOMIAL_OBJ_FILES) $(RANDOM_OBJ_FILES) $(PLOT_OBJ_FILES)
-
-
-
-
-MAIN = $(LIB_DIR)/libiRRAM_extension.a # static library
-
-all: $(MAIN)
-
-$(MAIN): $(OBJ_FILES) lib
-	ar -r $(MAIN) $(OBJ_FILES)
-
-lib:
-	mkdir $(LIB_DIR)
 
 ##########
 # Sublibrary build for development
@@ -60,19 +88,6 @@ plot: $(PLOT_OBJ_FILES) lib
 	ar -r $(LIB_DIR)/libiRRAM_plot.a $(PLOT_OBJ_FILES)
 
 ALL_LIBS = $(wildcard $(LIB_DIR)/*.a)
-
-##########
-%.o: %.cpp
-	$(CPPC) $(INCLUDES) $(CPPFLAGS) $(LIBS) -c $< -o $@
-
-
-##########
-# run test code
-
-TESTDIR = ./test
-
-test:
-	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test.cpp -L./$(LIB_DIR) -liRRAM_extension $(LIBS) -o $(TESTDIR)/test
 
 
 ##########
@@ -97,4 +112,4 @@ test_plot:
 # clean
 .PHONY : clean test test_linear test_compact test_polynomial test_random test_plot
 clean:
-	-rm edit $(OBJ_FILES) $(ALL_LIBS)
+	-rm $(SRC_OBJ_FILES) $(ALL_LIBS)
