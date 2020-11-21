@@ -37,6 +37,7 @@ REALMATRIX hessenberg_reduction(REALMATRIX M, int p); // reduces to Hessenberg w
 // - Regular matrix:
 REALMATRIX gelim (REALMATRIX); // gaussian elimination for regular matrix
 REAL determinant(REALMATRIX M); // partial=
+REAL det_approx(REALMATRIX M, int p ); // total, using limit, Hadamard bound, approx.
 // REAL det(REALMATRIX M);
 REALMATRIX linearSys(REALMATRIX M, REALMATRIX b);
 REALMATRIX inv(REALMATRIX M);

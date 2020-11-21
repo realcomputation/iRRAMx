@@ -659,9 +659,27 @@ std::vector<REAL> symm_eig(REALMATRIX M, int p)
 
 
 
+REALMATRIX rswap(REALMATRIX A, int i, int j){
+  REAL tmp;
+  REALMATRIX X = A;
+  for(unsigned int c = 0; c<X.maxcolumn; c++){
+    tmp = X(i, c);
+    X(i, c) = X(j, c);
+    X(j, c) = tmp;
+  }
+  return X;
+}
 
-
-
+REALMATRIX cswap(REALMATRIX A, int i, int j){
+  REAL tmp;
+  REALMATRIX X = A;
+  for(unsigned int c = 0; c<X.maxrow; c++){
+    tmp = X(c, i);
+    X(c, i) = X(c, j);
+    X(c, j) = tmp;
+  }
+  return X;
+}
 
 
 
@@ -885,6 +903,56 @@ REAL determinant(REALMATRIX M)
 		det *= W(i,i);
 	return det;
 }
+
+// using hadamard bound. p is negative
+REAL det_approx(REALMATRIX M, int p)
+{
+	REALMATRIX W = M;
+	REAL det = 1;
+	REAL tmp = 0;
+	REAL tmpV;
+  int tr, tc;
+	for(int i=0; i<(int)W.maxrow; i++)
+	{
+
+    tmp = 0;
+    for(unsigned int l = i; l < W.maxrow; l ++)
+      for(unsigned int m = i; m < W.maxrow; m ++)
+        tmp = maximum(abs(W(l, m)), tmp);
+
+    // test if the det can be neglected..
+    int b = upperbound(det)+2;
+    REAL eps = prec(p + b);
+    if (choose(tmp < eps, tmp > eps / 2) == 1)
+      return 0;
+
+    // there is nonzero index!
+    for(unsigned int l = i; l < W.maxrow; l ++)
+      for(unsigned int m = i; m < W.maxrow; m ++)
+        if(choose(abs(W(l, m)) > tmp / 2, abs(W(l, m)) < tmp) == 1){
+          tr = l;
+          tc = m;
+        }
+
+    if (tr != i)
+      det = - det;
+    if (tc != i)
+      det = - det;
+
+    W = rswap(W, i, tr);
+    W = cswap(W, i, tc);
+
+		for(int j=i+1; j<(int)W.maxrow; j++)
+		{
+			tmpV = W(j,i)/W(i,i);
+			for(int l=0; l<(int)W.maxcolumn; l++)
+				W(j,l) = W(j,l) - W(i,l)*tmpV;
+		}
+    det = det * W(i, i);
+  }
+  return det;
+}
+
 
 
 REALMATRIX inv(REALMATRIX M)
