@@ -11,6 +11,7 @@ LIB_DIR = ./lib
 # all cpp files
 SRC_CPP_FILES := $(wildcard ./src/*/*.cpp)
 SRC_OBJ_FILES := $(subst .cpp,.o,$(SRC_CPP_FILES))
+INC_HPP_FILES := $(wildcard ./include/iRRAM_extension/*.hpp) $(wildcard ./include/iRRAM_extension/*/*.hpp)
 
 ##########
 # target is the library file
@@ -18,7 +19,7 @@ MAIN = $(LIB_DIR)/libiRRAM_extension.a
 
 all: $(MAIN)
 
-$(MAIN): $(SRC_OBJ_FILES) lib
+$(MAIN): $(SRC_OBJ_FILES) lib $(INC_HPP_FILES)
 	ar -r $(MAIN) $(SRC_OBJ_FILES)
 
 ##########
