@@ -8,49 +8,51 @@
 using namespace iRRAM;
 namespace iRRAM{
 
+typedef REALMATRIX REALVECTOR;
+
 // utilities
 std::string to_string_double (REALMATRIX M);
 
 
-// elementary ops
+// level 1 where no computation is required
+REALMATRIX rswap(REALMATRIX, int, int);
+REALMATRIX cswap(REALMATRIX, int, int);
+REALVECTOR cvec(REALMATRIX, int);
+REALVECTOR cvec(REALMATRIX, int, int);
 REALMATRIX transpose(REALMATRIX M);
-REAL trace(REALMATRIX M);
-
-// constructions of special matrices
 REALMATRIX block_matrix(REALMATRIX A, REALMATRIX B, REALMATRIX C, REALMATRIX D); // [A B ; C D]
 REALMATRIX block_diag_matrix(REALMATRIX A, REALMATRIX B); // [A 0 ; 0 B]
+REALMATRIX Givens (unsigned int n, unsigned int i, unsigned int j, REAL  c, REAL s);
+REALMATRIX concat(REALMATRIX A, REALMATRIX B);
+REALMATRIX basisVector(int i, int n);
+REALMATRIX subMatrix(REALMATRIX M, int r, int c);
 
-// matrix algorithms:
+// level 2 where some computation is required
+REAL inner(REALVECTOR, REALVECTOR);
+REAL trace(REALMATRIX M);
+REAL det(REALMATRIX M); // defined via limit on det_approx. it is a total function.
+REAL Enorm(REALMATRIX M);
+REAL Fnorm(REALMATRIX M);
+REALVECTOR projection(REALVECTOR u, REALVECTOR v);
+REALMATRIX block_decompose(REALMATRIX A, unsigned int i, unsigned int j);
+void block_decompose(REALMATRIX A, unsigned int i, unsigned int j, REALMATRIX* L);
+REALMATRIX normalize(REALVECTOR u);
+REALMATRIX Householder(REALVECTOR u);
+
+// level 3
 REALMATRIX strassen (REALMATRIX, REALMATRIX); // strassen fast multiplication
+REALMATRIX linearSys(REALMATRIX M, REALVECTOR b);
+REALMATRIX inv(REALMATRIX M);
+REALMATRIX kernel (REALMATRIX, int); // orthogonal kernel basis
 
-
-// Decompositions
 std::pair<REALMATRIX, REALMATRIX> QR(REALMATRIX); // QR decomposition
 std::pair<REALMATRIX, REALMATRIX> QR_H(REALMATRIX); // QR decomposition for Hessenberg matrix
-
-
-// Reductions
 REALMATRIX hessenberg_reduction(REALMATRIX M, int p); // reduces to Hessenberg with eig perturbation 2^p
 
 
-// linear system
-// - Regular matrix:
-REALMATRIX gelim (REALMATRIX); // gaussian elimination for regular matrix
-REAL determinant(REALMATRIX M); // partial=
-REAL det_approx(REALMATRIX M, int p ); // total, using limit, Hadamard bound, approx.
-// REAL det(REALMATRIX M);
-REALMATRIX linearSys(REALMATRIX M, REALMATRIX b);
-REALMATRIX inv(REALMATRIX M);
-
-// - General matrix:
-REALMATRIX kernel (REALMATRIX, int); // orthogonal kernel basis
-REALMATRIX gelim (REALMATRIX, int); // gaussian elimination for irrelgualr matrix
-
-
-// Symmetric Eigenproblem
+// level 4
 std::vector<REAL> symm_eig (REALMATRIX, int); // approximate eigenvalues of symmetric matrix
 REALMATRIX eigenVector(REALMATRIX A, REAL e, int num); //
-
 
 
 }
