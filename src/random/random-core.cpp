@@ -20,7 +20,7 @@ INTEGER pow(int a, int b)
 
 REALRAND::REALRAND()
   {
-    int prec = ACTUAL_STACK.actual_prec;
+    int prec = actual_stack().actual_prec;
 
     sizetype err;
     std::string r;
@@ -38,10 +38,10 @@ REALRAND::REALRAND()
     std::uniform_int_distribution<> dis(0, 65535);
 
 
-    if (ACTUAL_STACK.inlimit == 0)
+    if (actual_stack().inlimit == 0)
     {
-      if(iRRAM_thread_data_address->cache_s.get(result_bits)
-        && iRRAM_thread_data_address->cache_i.get(result_size))
+      if(get_cached(result_bits)
+        && get_cached(result_size))
       {
         r = result_bits;
         s = result_size;
@@ -50,8 +50,8 @@ REALRAND::REALRAND()
       {
         result_bits = std::to_string(dis(gen));
         result_size = 16;
-        iRRAM_thread_data_address->cache_s.put(result_bits);
-        iRRAM_thread_data_address->cache_i.put(result_size);
+        put_cached(result_bits);
+        put_cached(result_size);
         r = result_bits;
         s = result_size;
       }
@@ -68,8 +68,8 @@ REALRAND::REALRAND()
     bits = swrite(result_integer);
     bitlength = needblock * 16;
 
-    iRRAM_thread_data_address->cache_s.modify(bits);
-    iRRAM_thread_data_address->cache_i.modify(bitlength);
+    modify_cached(bits);
+    modify_cached(bitlength);
 
 
     sizetype_set(err,1,-bitlength);
