@@ -6,9 +6,6 @@
 using namespace iRRAM;
 namespace iRRAM{
 
-REAL prec(int p){
-  return scale(REAL(1), p);
-}
 
 REAL inner(REALVECTOR u, REALVECTOR v)
 {
@@ -53,7 +50,7 @@ REAL Fnorm(REALMATRIX M)
 
 
 // householder reflector
-REALMATRIX Householder(REALVECTOR u){
+REALMATRIX householder(REALVECTOR u){
 //u is a column vector
   REALMATRIX X(u.maxrow, u.maxrow);
   for(unsigned int i = 0; i < u.maxrow; i++)

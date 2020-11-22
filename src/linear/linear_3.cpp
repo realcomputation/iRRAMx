@@ -6,9 +6,6 @@
 using namespace iRRAM;
 namespace iRRAM{
 
-REAL prec(int p){
-  return scale(REAL(1), p);
-}
 
 // using hadamard bound. p is negative
 REAL det_approx(int p, REALMATRIX M)
@@ -186,7 +183,7 @@ REALMATRIX strassen (const REALMATRIX& x, const REALMATRIX& y){
 
 
 //
-REALMATRIX linearSys(REALMATRIX M, REALMATRIX b)
+REALMATRIX linear_sys(REALMATRIX M, REALMATRIX b)
 {
 	REALMATRIX W = M;
 	REALMATRIX w = b;
@@ -262,7 +259,7 @@ REALMATRIX inv(REALMATRIX M)
 	REALMATRIX INV = REALMATRIX(M.maxcolumn,M.maxcolumn);
 	for (int i = 0 ; i < (int)M.maxcolumn; i ++)
 		INV(i,i) = 1;
-	REALMATRIX ins = linearSys(M,INV);
+	REALMATRIX ins = linear_sys(M,INV);
 	return ins;
 }
 
@@ -282,12 +279,12 @@ REALMATRIX GramSchmidt(REALMATRIX M)
 			v = v - projection(cvec(Q, j), cvec(M, i));
 		}
 		v = v /sqrt(inner(v,v));
-		Q = concat(Q, v);
+		Q = rconcat(Q, v);
 	}
 	return Q;
 }
 
-REALMATRIX eigenVector(REALMATRIX A, REAL eigenValue, int nulldim)
+REALMATRIX eigen_vec(REALMATRIX A, REAL eigenValue, int nulldim)
 {
 
 	REAL max, pivotvalue, scale, temp;
@@ -417,7 +414,7 @@ REALMATRIX eigenVector(REALMATRIX A, REAL eigenValue, int nulldim)
 
 
 REALMATRIX kernel(REALMATRIX A, int nulldim){
-  return eigenVector(A, 0, nulldim);
+  return eigen_vec(A, 0, nulldim);
 }
 
 

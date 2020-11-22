@@ -6,9 +6,7 @@
 using namespace iRRAM;
 namespace iRRAM{
 
-REAL prec(int p){
-  return scale(REAL(1), p);
-}
+
 
 double rtod (REAL r){
   return std::stod(swrite(r, 50));

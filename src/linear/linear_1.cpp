@@ -6,10 +6,6 @@
 using namespace iRRAM;
 namespace iRRAM{
 
-REAL prec(int p){
-  return scale(REAL(1), p);
-}
-
 
 REALMATRIX rswap(REALMATRIX A, int i, int j){
   REAL tmp;
@@ -42,7 +38,7 @@ REALVECTOR cvec(REALMATRIX u, int idx)
 	}
 	return v;
 }
-// 
+//
 // REALVECTOR cvec(REALMATRIX u, int r, int c)
 // {
 // 	REALMATRIX v = REALMATRIX(u.maxrow - r, 1);
@@ -161,7 +157,7 @@ REALMATRIX transpose(REALMATRIX M)
  */
 // Constructs Givens matrix
 // i < j <= n, c^2 + s^2 = 1
-REALMATRIX Givens (unsigned int n, unsigned int i, unsigned int j, REAL  c, REAL s)
+REALMATRIX givens(unsigned int n, unsigned int i, unsigned int j, REAL  c, REAL s)
 {
     REALMATRIX G = eye(n);
     G(i,i) = c;
@@ -173,14 +169,14 @@ REALMATRIX Givens (unsigned int n, unsigned int i, unsigned int j, REAL  c, REAL
 
 
 
-REALMATRIX basisVector(int i, int n)
+REALMATRIX basis_vec(int i, int n)
 {
 	REALMATRIX M = REALMATRIX(n, 1);
 	M(i,0) = 1;
 	return M;
 }
 
-REALMATRIX subMatrix(REALMATRIX M, int r, int c)
+REALMATRIX submatrix(REALMATRIX M, int r, int c)
 {
 	REALMATRIX N = REALMATRIX(M.maxrow-r, M.maxcolumn-c);
 	for(int i=r; i <(int)M.maxrow; i++)
@@ -191,7 +187,7 @@ REALMATRIX subMatrix(REALMATRIX M, int r, int c)
 }
 
 
-REALMATRIX concat(REALMATRIX A, REALMATRIX B)
+REALMATRIX rconcat(REALMATRIX A, REALMATRIX B)
 {
 	if(A.maxrow == 0)
 		return B;
@@ -215,5 +211,32 @@ REALMATRIX concat(REALMATRIX A, REALMATRIX B)
 	}
 	return M;
 }
+
+
+REALMATRIX cconcat(REALMATRIX A, REALMATRIX B)
+{
+	if(A.maxcolumn == 0)
+		return B;
+	if(B.maxcolumn == 0)
+		return A;
+
+	REALMATRIX M(A.maxrow + B.maxrow, A.maxcolumn);
+	for(int c = 0; c<(int)A.maxcolumn; c++)
+	{
+		for(int r = 0; r<(int)A.maxrow+(int)B.maxrow; r++)
+		{
+			if (r<(int)A.maxrow)
+			{
+				M(r,c) = A(r,c);
+			}
+			else
+			{
+				M(r,c) = B(r-A.maxrow,c);
+			}
+		}
+	}
+	return M;
+}
+
 
 }

@@ -103,28 +103,26 @@ The input p is supposed to be negative.
 
 #### linear system
 
-- `REALMATRIX gelim(REALMATRIX X, int k)`
+- `REAL det(REALMATRIX X)`
 
-> **returns** M : REALMATRIX which is a resulting matrix of performing Gaussian elimination on matrix X whose rank is k
+> **returns** the determinant of the square matrix X. (uses Hadamard bound and
+Gaussian algorithm)
 
 - `REALMATRIX inv(REALMATRIX X)`
 
 > **returns** M : REALMATRIX which is the multiplicative inverse X. ***This is partially defined***
 
-- `REAL det_approx(REALMATRIX M, int p)`
-
-> **returns** det : REAL which is 2^p approximation to the determinant of a square matrix M. (uses Hadamard bound and
-Gaussian algorithm)
-
 - `REALMATRIX kernel(REALMATRIX X, int k)`
 
 > **returns** C : REALMATRIX which consists of k orthogonal column vectors which span the k dimensional kernel of X.
 
+- `REALMATRIX linear_sys`
+
 #### Eigenproblem
 
-- `std::vector<REAL> symm_eig (REALMATRIX X, int k)`
+- `std::vector<REAL> symm_eig (REALMATRIX X)`
 
-> **returns** V : std::vector<REAL> whose elements approximate the eigenvalues of X by 2^k when X is symmetric.
+> **returns** V : std::vector<REAL> whose elements are the eigenvalues of X by 2^k when X is symmetric.
 
 ### iRRAM_extension/polynomial.hpp
 

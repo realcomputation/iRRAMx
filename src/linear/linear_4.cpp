@@ -6,10 +6,6 @@
 using namespace iRRAM;
 namespace iRRAM{
 
-REAL prec(int p){
-  return scale(REAL(1), p);
-}
-
 
 /* Reducing a symmetric matrix into a Tridiagonal matrix.
  * First one requires the matrix to be special.
@@ -174,13 +170,16 @@ REALMATRIX Hessenberg_QR_step(REALMATRIX M)
     return H;
 }
 
-std::vector<REAL> tridiagonal_QR_algorithm (REALMATRIX M, int p)
+REALVECTOR tridiagonal_QR_algorithm (REALMATRIX M, int p)
 {
     int n = M.maxrow;
     cout << n <<"\n";
 
-    if(n == 1)
-      return {M(0,0)};
+    if(n == 1){
+      REALVECTOR E(1, 1);
+      E(0, 0) = M(0,0);
+      return E;
+    }
     if(n == 2){
       REAL tr = M(0,0) + M(1, 1);
       REAL det = M(0,0) * M(1, 1) - M(1, 0) * M(0, 1);
@@ -189,10 +188,10 @@ std::vector<REAL> tridiagonal_QR_algorithm (REALMATRIX M, int p)
 
       eig1 = ( tr - sqrt(tr * tr - 4*det)) / 2;
       eig2 = ( tr + sqrt(tr * tr - 4*det)) / 2;
-
-      return {eig1, eig2};
-
-
+      REALVECTOR E(2, 1);
+      E(0, 0) = eig1;
+      E(1, 0) = eig2;
+      return E;
     }
 
 
@@ -217,6 +216,7 @@ std::vector<REAL> tridiagonal_QR_algorithm (REALMATRIX M, int p)
 	m -= 1;
     }
 
+
     REAL a1 = H(0,0);
     REAL a2 = H(1,1);
     REAL b = H(1,0);
@@ -225,12 +225,34 @@ std::vector<REAL> tridiagonal_QR_algorithm (REALMATRIX M, int p)
     REAL l2 = (a1 + a2 - tmp)/2;
     eigens[n-2] = l1;
     eigens[n-1] = l2;
-    return eigens;
+
+
+    REALVECTOR E(n, 1);
+    for (int i = 0; i < n; i++)
+      E(i, 0) = eigens[i];
+    return E;
+    //
+    // return eigens;
 }
 
 
 
-
+REALVECTOR mysort(int p, REALVECTOR X){
+  REALVECTOR A = X;
+  int n = A.maxrow;
+  REAL tmp;
+  REAL eps = prec(p);
+  for (int i = 1; i < n; i ++){
+    for (int j = 0; j < i; j ++){
+      if (choose(A(j, 0) > A(i, 0) - eps, A(i, 0) > A(j, 0) - eps) == 1 ){
+      	tmp = A(i, 0);
+      	A(i, 0) = A(j, 0);
+      	A(j, 0) = tmp;
+      }
+    }
+  }
+  return A;
+}
 
 std::vector<REAL> mysort( std::vector<REAL> A, int p){
 
@@ -250,33 +272,30 @@ std::vector<REAL> mysort( std::vector<REAL> A, int p){
 }
 
 
-std::vector<REAL> symm_eig(REALMATRIX M, int p)
+REALMATRIX symm_eig_approx(int p, REALMATRIX M)
 {
 
-  std::vector<REAL> eigen, eigens;
+  REALMATRIX eigen;
   int n = M.maxrow;
-  int ind = 0;
-  eigens.reserve(n);
-  for(int i=0; i<n; i++)
-  	eigens.push_back(0);
+
 
   M = hessenberg_reduction(M, p - 3);
 
   std::vector<REALMATRIX> T = split(M, p - 3);
 
-  for(unsigned int k = 0; k < T.size(); k++)
-  {
+  eigen = tridiagonal_QR_algorithm(T[0], p - 5);
 
-  	eigen = tridiagonal_QR_algorithm(T[k], p - 3);
-  	for(unsigned int i = 0; i < T[k].maxrow; i++)
-  	{
-  	    eigens[ind] = eigen[i];
-  	    ind++;
-  	}
-  }
-  return mysort(eigens, p);
+  for(unsigned int k = 1; k < T.size(); k++)
+    eigen = cconcat(eigen, tridiagonal_QR_algorithm(T[k], p - 5));
+
+  return mysort(p-5, eigen);
 }
 
+
+REALVECTOR symm_eig(REALMATRIX M)
+{
+  return limit(symm_eig_approx, M);
+}
 
 
 
@@ -316,12 +335,12 @@ REALMATRIX QRDecomposition(REALMATRIX X)
 	{
 		x = cvec(Y, 0);
 		alpha = sqrt(inner(x, x));
-		u = x - alpha * basisVector(0, n - i);
+		u = x - alpha * basis_vec(0, n - i);
 		v = u / sqrt(inner(u,u));
 		Q[i] = eye(n-i) - 2 * v * transpose(v);
 		Y = Q[i]*Y;
 		rr[i] = Y(0,0);
-		Y = subMatrix(Y, 1,1);
+		Y = submatrix(Y, 1,1);
 	}
 	rr[n-1] = Y(0,0);
 
@@ -380,7 +399,7 @@ std::pair<REALMATRIX, REALMATRIX> QR (REALMATRIX M){
       else
         e(j,0) = 0;
     }
-    REALMATRIX H = Householder(normalize(y - Enorm(y) * e));
+    REALMATRIX H = householder(normalize(y - Enorm(y) * e));
     reflectors.push_back(H);
     A = H * A;
   }
