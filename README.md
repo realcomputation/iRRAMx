@@ -1,6 +1,7 @@
 # iRRAM_extensionn
 iRRAM_extension is a static C++ library that provides functionalities for rigorous scientific computation.
 It is designed in the way that it extends iRRAM.
+(See )
 iRRAM is another C++ library that provides exact real-number computation.
 iRRAM provides data type REAL for real numbers and primitive operators for the field arithmetic of real numbers.
 They are computed exactly in iRRAM such that they do not introduce any rounding errors!
@@ -9,7 +10,7 @@ Going beyond and based on those primitive operations, this extension provides mo
 ## Prerequisite
 Of course, being built on iRRAM, iRRAM is a prerequisite of this library.
 The users of this library first have to install iRRAM in their system.
-Our library is, at this moment, compatible with the version of iRRAM that is accessible through their [Github](https://github.com/norbert-mueller/iRRAM) in the most recent commit (_`a4d2409` on May 1, 2015_). When iRRAM is being installed, it asks whether it will be installed directly in the system or in a local directory. For now, iRRAM_extension only detects iRRAM when it is installed in system.
+Our library is, at this moment, compatible with the version of iRRAM that is accessible through a forked [Github repository](https://github.com/fbrausse/iRRAM) in the most recent commit (_`6545f78 on Mar 19, 2019`_). When iRRAM is being installed, it asks whether it will be installed directly in the system or in a local directory. For now, iRRAM_extension only detects iRRAM when it is installed in system.
 
 ## Installation
 iRRAM_extension is a static C++ library. Its compilation is deferred to the users.
