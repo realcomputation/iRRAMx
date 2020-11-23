@@ -24,6 +24,11 @@ void print(COMPLEX c)
 	cout << real(c) << " + i" << imag(c);
 }
 
+// string str(COMPLEX c)
+// {
+// 	return
+// }
+
 COMPLEX power(COMPLEX C, int n)
 {
 	COMPLEX D = COMPLEX(1,0);
@@ -68,7 +73,16 @@ RATIONAL maximum(RATIONAL a, RATIONAL b)
 	return b;
 }
 
+RATIONAL abs(RATIONAL a)
+{
+	if(a < 0)
+		return -a;
+	return a;
 
+}
+
+
+/*
 void print(OPENINTERVAL D)
 {
 	cout <<"("<<D.center - D.radius<<", "<< D.center + D.radius<<")\n";
@@ -76,6 +90,13 @@ void print(OPENINTERVAL D)
 void print(RATIONALINTERVAL D)
 {
 	cout <<"("<<D.center - D.radius<<", "<< D.center + D.radius<<")\n";
+}
+void print(RATIONALCOMPONENT C)
+{
+	cout <<"--- components ---\n";
+	for(int i=0; i < C.size(); i++)
+		print(C.intervals[i]);
+	cout <<"------------------\n";
 }
 
 void print(INTERVALCOMPONENT C)
@@ -86,14 +107,17 @@ void print(INTERVALCOMPONENT C)
 	cout <<"------------------\n";
 }
 
+*/
+
 void print(POLYNOMIAL P)
 {
 	for(int i=0;i<P.degree+1;i++)
 	{
 		if(i!=0)
 			cout<<" + ";
-		cout<< P.coef[P.degree-i] << "x^" << P.degree -i<< " ";
+		cout<< "("<<real(P.coef[P.degree-i])<<","<<imag(P.coef[P.degree-i]) << ")x^" << P.degree -i<< " ";
 	}
 	cout<<"\n";
 }
+
 }

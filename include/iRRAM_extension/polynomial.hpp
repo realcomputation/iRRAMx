@@ -1,55 +1,50 @@
 #pragma once
 
-#include <iRRAM/lib.h>
+#include "iRRAM/lib.h"
+#include "iRRAM/core.h"
+#include "iRRAM_extension/polynomial/rcomplex.hpp"
 #include <utility>
-
 using namespace iRRAM;
 namespace iRRAM{
 
 class POLYNOMIAL
 {
 	public:
-		std::vector<REAL> coef;
+		std::vector<COMPLEX> coef;
 		int degree;
 
-		POLYNOMIAL(int, REAL *);
-		POLYNOMIAL(int, std::vector<REAL>);
-		POLYNOMIAL(REAL);
+		POLYNOMIAL(int, COMPLEX *);
+		POLYNOMIAL(int, std::vector<COMPLEX>);
+		POLYNOMIAL(COMPLEX);
 		POLYNOMIAL();
 		~POLYNOMIAL();
-		REAL operator () (const REAL&);
+		COMPLEX operator () (const COMPLEX&);
 };
 
 POLYNOMIAL operator + (const POLYNOMIAL&, const POLYNOMIAL&);
-POLYNOMIAL operator + (const POLYNOMIAL&, const REAL&);
-POLYNOMIAL operator + (const REAL&, const POLYNOMIAL&);
-POLYNOMIAL operator - (const POLYNOMIAL&);
 POLYNOMIAL operator - (const POLYNOMIAL&, const POLYNOMIAL&);
-POLYNOMIAL operator - (const POLYNOMIAL&, const REAL&);
-POLYNOMIAL operator - (const REAL&, const POLYNOMIAL&);
 POLYNOMIAL operator * (const POLYNOMIAL&, const POLYNOMIAL&);
-POLYNOMIAL operator * (const POLYNOMIAL&, const REAL&);
-POLYNOMIAL operator * (const REAL&, const POLYNOMIAL&);
-POLYNOMIAL operator / (const POLYNOMIAL&, const REAL&);
 
-// template <> struct is_continuous<POLYNOMIAL> : public std::true_type{};
+namespace internal{template <> struct is_continuous<POLYNOMIAL> : public std::true_type{};}
 // void geterror(const POLYNOMIAL &);
 int geterror_exp(const POLYNOMIAL & );
 
 // Q = deriv(P,k) := Q^{(k)}
 POLYNOMIAL deriv(POLYNOMIAL, int);
 // y = evaluate(P, x) := P(x)
-REAL evaluate(POLYNOMIAL, REAL);
+COMPLEX evaluate(POLYNOMIAL, COMPLEX);
 // Taylor coefficients: a_k = CoefAt(P, k, z) := P^{(k)}(z)/k!
-REAL CoefAt(POLYNOMIAL, int, REAL);
-
-// Example polynomials
-POLYNOMIAL Chebyshev(int );
-POLYNOMIAL Uniform(int );
-POLYNOMIAL Wilkinson(int , REAL );
-
+COMPLEX CoefAt(POLYNOMIAL, int, COMPLEX);
 // Translation and dilation by g(x) = f(ax + b)
-POLYNOMIAL translation(POLYNOMIAL , REAL , REAL );
+// a : REAL, b : COMPLEX
+POLYNOMIAL translation(POLYNOMIAL , REAL , COMPLEX );
+
+
+
+// Find root
+
+std::vector<R_COMPLEX >
+root_approximation_newton(int prec, POLYNOMIAL P);
 
 
 }
