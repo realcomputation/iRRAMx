@@ -179,6 +179,7 @@ LAZY_BOOLEAN is_in (COMPONENT, COMPLEX);
 bool intersect(R_OPENDISC , R_OPENDISC );
 bool comp_disc_intersect(COMPONENT, R_OPENDISC );
 bool adj(COMPONENT , R_CLOSEDBOX );
+bool adj(COMPONENT , COMPONENT );
 void print(COMPONENT);
 void printr(COMPONENT);
 

@@ -3,6 +3,7 @@
 #include "iRRAM/lib.h"
 #include "iRRAM/core.h"
 #include "iRRAM_extension/polynomial/rcomplex.hpp"
+#include "iRRAM_extension/polynomial/polynomialroot.hpp"
 #include <utility>
 using namespace iRRAM;
 namespace iRRAM{
@@ -41,10 +42,27 @@ POLYNOMIAL translation(POLYNOMIAL , REAL , COMPLEX );
 
 
 
+class cvec_wrap{
+public:
+  std::vector<COMPLEX> data;
+  cvec_wrap(std::vector<COMPLEX> v){ data = v; }
+	cvec_wrap(){ }
+
+
+	void adderror (sizetype error);
+	void seterror (sizetype error);
+	void geterror (sizetype& error) const;
+
+
+
+
+};
+
+cvec_wrap root_approximation_newton(int p, std::string& choice, const POLYNOMIAL& Q);
+
 // Find root
 
-std::vector<R_COMPLEX >
-root_approximation_newton(int prec, POLYNOMIAL P);
+std::vector<COMPLEX > roots(POLYNOMIAL P);
 
 
 }

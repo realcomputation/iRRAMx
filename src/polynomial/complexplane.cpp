@@ -230,7 +230,7 @@ RATIONAL COMPONENT::Rc() const
 
 bool COMPONENT::is_empty() const
 {
-	return box_list.empty();
+	return box_list.size() == 0 ;
 }
 
 COMPONENT COMPONENT::split() const
@@ -316,10 +316,19 @@ bool adj(COMPONENT C, R_CLOSEDBOX I)
 	return false;
 }
 
+bool adj(COMPONENT C, COMPONENT I)
+{
+	for (int i=0; i<C.size(); i++)
+		if (adj(I, C[i]))
+			return true;
+	return false;
+}
+
+
 void print(COMPONENT C)
 {
 	for (int i=0; i<(int) C.box_list.size(); i++)
-		cout<<REAL(C.box_list[i].center.real()) <<", "<<REAL(C.box_list[i].center.imag())<<", "<<REAL(C.box_list[i].width) <<"\n";
+		cout<<REAL(C.box_list[i].center.real()) <<", "<<REAL(C.box_list[i].center.imag())<<", "<<REAL(C.box_list[i].width) << " "<<std::to_string(C.kc) << "\n";
 }
 void printr(COMPONENT C)
 {

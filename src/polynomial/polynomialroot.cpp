@@ -1,6 +1,8 @@
 #include "iRRAM_extension/polynomial/polynomialroot.hpp"
 #include "iRRAM_extension/polynomial/complexplane.hpp"
+#include "iRRAM_extension/polynomial.hpp"
 #include "iRRAM_extension/polynomial/utilities.hpp"
+#include "iRRAM_extension/utility.hpp"
 
 #include "iRRAM/lib.h"
 #include "iRRAM/core.h"
@@ -11,6 +13,10 @@
 #include <vector>
 #include <cmath>
 #include <time.h>
+
+#include <string>
+#include <sstream>
+#include <iterator>
 
 using namespace iRRAM;
 namespace iRRAM{
@@ -436,7 +442,7 @@ std::vector< COMPONENT >
 Bisect(POLYNOMIAL P, COMPONENT Comp)
 {
 	COMPONENT C;
-	std::vector< COMPONENT > U;
+	std::vector< COMPONENT > U, J;
 	R_CLOSEDBOX B;
 
 	int flg;
@@ -449,47 +455,87 @@ Bisect(POLYNOMIAL P, COMPONENT Comp)
 		B = C[i];
 		if (softGTest(P,0, R_OPENDISC(B)) == false)
 		{
-			flg = 0;
-			for(int j=0; j < (int)U.size(); j++)
-			{
-				if(adj(U[j], B))
-				{
-					U[j].add(B);
-					flg = 1;
-					break;
-				}
-			}
-			if (flg == 0)	// If there does not exists a adjoint component in U
-			{
-				COMPONENT T = COMPONENT(B);
-				T.depth = C.depth;
-				U.push_back(T);
-			}
+      COMPONENT T = COMPONENT(B);
+      T.depth = C.depth;
+      U.push_back(T);
+    }
+  }
 
-		}
-	}
-	if ((int)U.size() ==1)
+
+  std::vector<int> rm_idx;
+  for (int i = 0; i<U.size(); i++)
+    for (int j = i+1; j<U.size(); j++){
+      if(adj(U[i], U[j])){
+        for (int k = 0; k < U[i].size(); k++)
+          U[j].add(U[i][k]);
+        rm_idx.push_back(i);
+        break;
+      }
+    }
+
+
+
+  int tind = 0;
+  if (rm_idx.size() > 0){
+    for (int i = 0; i<U.size(); i++){
+      if(tind < rm_idx.size()){
+        if(i == rm_idx[tind]){
+          tind+=1;
+        }
+        else{
+          J.push_back(U[i]);
+        }
+      }
+      else{
+        J.push_back(U[i]);
+      }
+    }
+  }
+
+	if ((int)J.size() ==1)
 		specialflg = false;
 
-	for (int i=0; i<(int)U.size(); i++)
+	for (int i=0; i<(int)J.size(); i++)
 	{
 		if (specialflg)
-			U[i].Nc = 4;
+			J[i].Nc = 4;
 		else
 			if (sqrt(C.Nc) > 4)
-				U[i].Nc = sqrt(C.Nc);
+				J[i].Nc = sqrt(C.Nc);
 			else
-				U[i].Nc = 4;
+				J[i].Nc = 4;
 	}
-	return U;
+
+	return J;
 }
 
+template <typename Out>
+void split(const std::string &s, char delim, Out result) {
+    std::istringstream iss(s);
+    std::string item;
+    while (std::getline(iss, item, delim)) {
+        *result++ = item;
+    }
+}
 
+std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    split(s, delim, std::back_inserter(elems));
+    return elems;
+}
 
-std::vector<R_COMPLEX >
-root_approximation_newton(int prec, POLYNOMIAL P)
-{
+REAL dist(R_COMPLEX a, R_COMPLEX b){
+  REAL w = REAL(a.real()) - REAL(b.real());
+  REAL h = REAL(a.imag()) - REAL(b.imag());
+  return sqrt(w * w + h * h);
+}
 
+// std::vector<COMPLEX >
+cvec_wrap
+root_approximation_newton(int p, std::string& choice, const POLYNOMIAL& Q){
+
+  // std::cout <<"\nhelo\n";
+  POLYNOMIAL P = Q;
 	int n = P.degree;
 
 	/*
@@ -501,7 +547,6 @@ root_approximation_newton(int prec, POLYNOMIAL P)
 		D = D.multiply(2);
 	}
 
-	// std::cout <<"dd\n";
 
 	std::vector< COMPONENT > Q_out, Q_main;
 	std::vector< COMPONENT > bisect_result;
@@ -513,7 +558,7 @@ root_approximation_newton(int prec, POLYNOMIAL P)
 	Q_main.push_back(C);
 	COMPONENT Cprime;
 
-	REAL epsilon = power(2,prec);
+	REAL epsilon = prec(p);
 
 
 	int pi;
@@ -521,11 +566,11 @@ root_approximation_newton(int prec, POLYNOMIAL P)
 	RATIONAL tmp, qtmp;
 	COMPONENT tc;
 
-	cout << setRwidth(30);
 
 	int fll;
 	while(!Q_main.empty())
 	{
+    // std::cout<<"A\n";
 
 // 		Swap Q1[end -1] <-> Q1[max wc]
 		pi = 0;
@@ -540,19 +585,30 @@ root_approximation_newton(int prec, POLYNOMIAL P)
 				tmp = qtmp;
 			}
 		}
+
+    // std::cout<<"B\n";
+
 		tc = Q_main[pi];
 		Q_main[pi] = Q_main[(int) Q_main.size() - 1];
 		Q_main[(int) Q_main.size() -1] = tc;
 // 		swap done
+// std::cout<<"C\n";
 
 
 		C = Q_main.back();
 		Q_main.pop_back();
-		print(C);
-
+    // std::cout<<"===\n";
+		// printr(C);
+    // if (C.is_empty()) std::cout<<"is empty omg! \n";
+    //
+    // std::cout<<"===\n";
 		fll = 0;
 		R_OPENDISC II = R_OPENDISC(C.Mc(),C.Rc());
 
+    // std::cout<<"D\n";
+
+
+    // printr(C);
 		for(int i=0; i< (int) Q_main.size(); i++)
 		{
 			if(intersect(R_OPENDISC(Q_main[i].Mc(), Q_main[i].Rc()), II.multiply(4)))
@@ -561,49 +617,263 @@ root_approximation_newton(int prec, POLYNOMIAL P)
 				break;
 			}
 		}
-
+    // std::cout << std::to_string(fll) <<"\n";
+    // std::cout<<"E\n";
 		if (fll == 0)
 		{
 			C.kc = softGStar(P, II, P.degree);
-
+      // print(C);
 			if(C.kc >0)
 			{
-				if(choose(C.Wc() > epsilon, C.Wc() < epsilon*2) == 1)
+				if(choose(C.Wc() > epsilon / 2, C.Wc() < epsilon ) == 1)
 				{
 					Cprime= Newton(P,C,epsilon);
 
 					if(Cprime.is_empty() == false)
 					{
-						cout <<" newton worked\n";
+						// std::cout <<" newton worked\n";
 						Q_main.push_back(Cprime);
 						continue;
 					}
 				}
 				else if (C.Wc() <= 3 * C.wc())
 				{
+          // std::cout <<"adding"<<"\n";
+          // std::cout <<"adding"<<"\n";
+          // std::cout <<"adding"<<"\n";
+          // printr(C);
 					Q_out.push_back(C);
 					continue;
 				}
 			}
 		}
+    // std::cout<<"F\n";
 
+    // std::cout <<"bisection start!\n";
+    // print(C);
+    // std::cout <<"reduces to!\n";
 		bisect_result = Bisect(P,C);
-		for(int i=0; i<(int)bisect_result.size(); i++)
-			Q_main.push_back(bisect_result[i]);
+		for(int i=0; i<(int)bisect_result.size(); i++){
+      Q_main.push_back(bisect_result[i]);
+      // print(bisect_result[i]);
+      // std::cout<<"---\n";
+    }
+    // std::cout<<"G\n";
 
 
 	}
 
-
+  // std::cout<<"doneeeeeeeee\n";
 	std::vector< R_COMPLEX > roots;
 	for (int i =0; i<(int) Q_out.size(); i++)
 		for (int j=0; j< Q_out[i].kc; j++)
 			roots.push_back(Q_out[i].Mc());
 
 
+// CHECK M-cache
 
-	return roots;
+  std::vector< R_COMPLEX> ordered_roots;
+  if (choice == ""){
+    std::string r = std::to_string(p);
+    r += ",";
+    for (int i = 0; i < roots.size(); i++){
+      r += (swrite(numerator(roots[i].real())) +","+swrite(denominator(roots[i].real())));
+      r += (swrite(numerator(roots[i].imag())) +","+swrite(denominator(roots[i].imag())));
+    }
+    choice = r;
+
+    ordered_roots = roots;
+  }
+  else{
+    int cached_prec;
+    std::vector< R_COMPLEX> cached_roots;
+    std::vector< std::string> cached_vec = split(choice, ',');
+    cached_prec = std::stoi(cached_vec[0]);
+    for(int i = 0; i < (cached_vec.size() - 1) / 4; i++){
+      cached_roots.push_back(R_COMPLEX(RATIONAL(INTEGER(cached_vec[i*4+1]), INTEGER(cached_vec[i*4+2])), RATIONAL(INTEGER(cached_vec[i*4+3]), INTEGER(cached_vec[i*4+4]))));
+    }
+
+    for(int i = 0; i<cached_roots.size(); i ++){
+      for(int j = 0; j<roots.size(); j ++){
+        if(dist(cached_roots[i], roots[j]) < prec(cached_prec) + prec(p))
+        {
+          ordered_roots.push_back(roots[j]);
+          roots.erase(roots.begin() + j);
+          break;
+        }
+      }
+    }
+
+    std::string r = std::to_string(p);
+    r += ",";
+    for (int i = 0; i < roots.size(); i++){
+      r += (swrite(numerator(ordered_roots[i].real())) +","+swrite(denominator(ordered_roots[i].real())));
+      r += (swrite(numerator(ordered_roots[i].imag())) +","+swrite(denominator(ordered_roots[i].imag())));
+    }
+    choice = r;
+  }
+
+  std::vector<COMPLEX> croots;
+  for (int i = 0; i < ordered_roots.size(); i++)
+  {
+    croots.push_back(COMPLEX(REAL(ordered_roots[i].real()), REAL(ordered_roots[i].imag())));
+  }
+
+
+  // return croots;
+  return cvec_wrap(croots);
+
 }
+
+
+void cvec_wrap::adderror (sizetype error)
+{
+	for (unsigned int i=0; i < this->data.size(); i++)
+  	this->data[i].adderror(error);
+}
+
+void cvec_wrap::seterror (sizetype error)
+{
+	for (unsigned int i=0; i < this->data.size(); i++)
+  	this->data[i].seterror(error);
+}
+
+void cvec_wrap::geterror (sizetype& error) const
+{
+
+  sizetype lerror;
+	this->data[0].geterror(error);
+	for (unsigned int i=0; i< this->data.size(); i++)
+	{
+		this->data[i].geterror(lerror);
+		error = max(error,lerror);
+	}
+}
+
+
+namespace internal{template <> struct is_continuous<cvec_wrap > : public std::true_type{};}
+
+
+
+template <typename R, typename C, typename... Args>
+std::enable_if_t<internal::is_cacheable<C>::value, R>
+limit_mv2(R (*seq)(int prec, C &choice, const Args &... args),
+         C choice, const Args &... x)
+{
+	bool inlimit = actual_stack().inlimit != 0;
+
+	limit_computation env;
+
+	R lim, limnew;
+	sizetype limnew_error, element_error;
+	sizetype lim_error;
+
+	int element = env.saved_prec();
+	int element_step = env.saved_step();
+	int firsttime = 2;
+
+	if (!inlimit &&
+	    !get_cached(choice)) /* TODO: why only in case of !inlimit? */
+		put_cached(choice);
+
+	int x_error_exp = geterror_exp(x...);
+
+	limit_debug("starting gen limit_mv");
+
+	while (1) {
+		try {
+			iRRAM_DEBUG2(2, "trying to compute gen limit_mv with "
+			                "precicion 2^(%d)...\n",
+			             element);
+
+
+			limnew = seq(element, choice, x...);
+
+
+			modify_cached(choice);
+			element_error = sizetype_power2(element);
+			limnew.geterror(limnew_error);
+			limnew_error += element_error;
+			if (firsttime == 2)
+				if (limnew_error.exponent >
+				            env.saved_prec(-1) &&
+				    limnew_error.exponent >
+				            x_error_exp - env.saved_prec(-1)) {
+					iRRAM_DEBUG2(2,
+					             "computation not precise "
+					             "enough (%d*2^%d), trying "
+					             "normal p-sequence\n",
+					             limnew_error.mantissa,
+					             limnew_error.exponent);
+					element_step = 1;
+					element =
+					        4 +
+					        iRRAM_prec_array[element_step];
+					firsttime = 1;
+				}
+        if (firsttime != 0 || sizetype_less(limnew_error, lim_error)) {
+          lim = limnew;
+          lim_error = limnew_error;
+          iRRAM_DEBUG2(2, "getting result with error %d*2^(%d)\n",
+                       lim_error.mantissa, lim_error.exponent);
+        } else {
+          iRRAM_DEBUG1(
+                  2,
+                  "computation successful, but no improvement\n");
+        }
+        firsttime = 0;
+        if (element <= env.saved_prec())
+          break;
+        element_step += 4;
+        element = iRRAM_prec_array[element_step];
+
+		} catch (const Iteration &it) {
+			if (firsttime == 0) {
+				iRRAM_DEBUG1(2, "computation failed, using "
+				                "best success\n");
+				break;
+			} else if (firsttime == 2) {
+				iRRAM_DEBUG1(2, "computation failed, trying "
+				                "normal p-sequence\n");
+				element_step = 1;
+				element = 4 + iRRAM_prec_array[element_step];
+				firsttime = 1;
+			} else {
+				iRRAM_DEBUG1(1, "computation of limit_gen1 "
+				                "failed totally\n");
+				iRRAM_REITERATE(0);
+			}
+		}
+	}
+	lim.seterror(lim_error);
+	iRRAM_DEBUG2(2, "end of gen limit_mv with error %d*2^(%d)\n",
+	             lim_error.mantissa, lim_error.exponent);
+	return lim;
+}
+
+
+
+
+
+std::vector<COMPLEX> roots(POLYNOMIAL P){
+  std::string r = "";
+
+  // return limit_mv<std::vector<COMPLEX> >(root_approximation_newton, r, P);
+  cvec_wrap t = limit_mv2<cvec_wrap >(root_approximation_newton, r, P);
+  return t.data;
+
+}
+
+// template <typename Out>
+// void split(const std::string &s, char delim, Out result) {
+//     std::istringstream iss(s);
+//     std::string item;
+//     while (std::getline(iss, item, delim)) {
+//         *result++ = item;
+//     }
+// }
+
+
 
 
 }
