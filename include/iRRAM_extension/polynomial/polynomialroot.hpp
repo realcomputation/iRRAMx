@@ -59,6 +59,24 @@ inline void seterror(std::vector<std::pair<REAL, int> > & l, sizetype & error)
 		l[i].first.seterror(error);
 }
 
+
+class cvec_wrap{
+public:
+  std::vector<COMPLEX> data;
+  cvec_wrap(std::vector<COMPLEX> v){ data = v; }
+	cvec_wrap(){ }
+
+
+	void adderror (sizetype error);
+	void seterror (sizetype error);
+	void geterror (sizetype& error) const;
+
+
+
+
+};
+
+
 //
 // std::vector<R_COMPLEX >
 // root_approximation_naive(int , POLYNOMIAL );
