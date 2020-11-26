@@ -55,6 +55,49 @@ Here, `compute` is a function that replaces `main` in iRRAM. The readers who are
 
 ### iRRAM_extension/compact.hpp
 
+#### Compact
+
+- `Compact()`
+- `Compact(std::function<bool(Point<N>, int)> cfun)`
+
+> *cfun*: the characteristic function that defines a compact set
+>
+> **returns** a compact set(defined by *cfun*)
+
+- `Compact::plot2D(filename, width, x1, y1, x2, y2)`
+
+> Create an image of the compact set on ℝ² in PNG format.
+
+- `disjunction(Compact c1, Compact c2)`
+
+> **returns** a compact set made by disjunction of *c1* and *c2*
+
+- `conjunction(Compact c1, Compact c2)`
+
+> **returns** a compact set made by conjunction of *c1* and *c2*
+
+#### Path
+
+**Path** inherits **Compact**.
+
+- `Path()`
+- `Path(std::function<Point<N>(REAL)> f)`
+
+> *f*: a function [0,1]→ℝⁿ
+>
+> **returns** a path(defined by *f*)
+
+#### Surface
+
+**Surface** inherits **Compact**.
+
+- `Surface()`
+- `Surface(std::function<Point<N>(REAL,REAL)> f)`
+
+> *f*: a function [0,1]²→ℝⁿ
+>
+> **returns** a surface(defined by *f*)
+
 
 ### iRRAM_extension/linear.hpp
 - `std::string to_string_double (REALMATRIX M)`
