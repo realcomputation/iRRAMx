@@ -1,8 +1,8 @@
 #pragma once
-// #include <iRRAM.h>
-#include <iRRAM/lib.h>
+// iRRAM extension for compact subsets in euclidean
+// author: Jiman Hwang(molehair a.t kaist.ac.kr)
 
-
-using namespace iRRAM;
-
-REAL func1(REAL x, REAL y);
+#include "compact/compact.hpp"
+#include "compact/euclidean.hpp"
+#include "compact/path.hpp"
+#include "compact/surface.hpp"

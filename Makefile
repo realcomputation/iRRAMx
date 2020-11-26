@@ -1,6 +1,6 @@
 CPPC                 = gcc
 CPPFLAGS             = -std=c++14 -O2 -Wall
-LIBS = -liRRAM -lmpfr -lgmp
+LIBS = -liRRAM -lmpfr -lgmp -lpng
 INCLUDES = -I./include
 
 ##########
