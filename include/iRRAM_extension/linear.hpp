@@ -17,23 +17,44 @@ typedef REALMATRIX REALVECTOR;
 std::string to_string_double (REALMATRIX M);
 
 /** @defgroup linalg Linear Algebra
+ *  @brief include "iRRAM_extension/linear.h"
  *  This is the collection of function specifications related to
  *  linear algebra
- *  @{
+ */
+
+/** @defgroup linalgSub1 Level 1
+ *  @brief operations that do not require any computation on matrix elements; e.g., swaping rows
+ *  @ingroup linalg
+ */
+
+/** @defgroup linalgSub2 Level 2
+ *  @brief operations that require simple computations on matrix elements; e.g., matrix norms
+ *  @ingroup linalg
+ */
+
+/** @defgroup linalgSub3 Level 3
+ *  @brief operations that require iteration over rows and columns; e.g., computing determinant
+ *  @ingroup linalg
+ */
+
+/** @defgroup linalgSub4 Level 4
+ *  @brief operations operations that requiare complicated stuffs..; e.g., eigenproblem
+ *  @ingroup linalg
  */
 
 
-// level 1 where no computation is required
+
+/** \addtogroup linalgSub1
+*  @{
+*/
 
 /*! @brief elementary op. for swaping rows
  *
+ *  @param i a row index of A
+ *  @param j a column index of A
+ *
  *  @return a matrix which is identical to A but i'th and j'th rows are swapped.
  */
-
-/// @brief This method adds two integers.
-/// @param a First integer to add.
-/// @param b Second integer to add.
-/// @return The sum of both parameters.
 REALMATRIX rswap(REALMATRIX A, int i, int j);
 
 /*! @brief elementary op. for swaping columns
@@ -127,7 +148,15 @@ REALMATRIX basis_vec(int i, int n);
  */
 REALMATRIX submatrix(REALMATRIX M, int r, int c);
 
-// level 2 where some computation is required
+
+/** @} */
+
+
+
+
+/** \addtogroup linalgSub2
+*  @{
+*/
 
 /*! @brief compute the inner product of two column vectors
  *
@@ -187,7 +216,14 @@ REALMATRIX normalize(REALVECTOR u);
  */
 REALMATRIX householder(REALVECTOR u);
 
-// level 3
+/** @} */
+
+
+
+/** \addtogroup linalgSub3
+*  @{
+*/
+
 
 /*! @brief multiply two square matrices using Strassen algorithm
  *
@@ -262,8 +298,14 @@ std::pair<REALMATRIX, REALMATRIX> QR_H(REALMATRIX); // QR decomposition for Hess
  */
 REALMATRIX hessenberg_reduction(REALMATRIX M, int p); // reduces to Hessenberg with eig perturbation 2^p
 
+/** @} */
 
-// level 4
+
+
+/** \addtogroup linalgSub4
+*  @{
+*/
+
 
 /*! @brief compute the eigenvalues of a symmetric matrix
  *
@@ -283,6 +325,6 @@ REALVECTOR symm_eig (REALMATRIX M); //  eigenvalues of symmetric matrix
  */
 REALMATRIX eigen_vec(REALMATRIX M, REAL e, int num); //
 
-/** @} */ 
+/** @} */
 
 }

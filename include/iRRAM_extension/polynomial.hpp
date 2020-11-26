@@ -7,15 +7,52 @@
 using namespace iRRAM;
 namespace iRRAM{
 
+/** @defgroup poly Polynomial Roots
+ *  @brief include "iRRAM_extension/polynomial.h"
+ *  This is the collection of function specifications related to
+ *  finding roots of polynomials
+ *  @{
+ */
+
+
+//!  A class for complex polynomials.
+/*!
+  A class of polynomials with complex coefficients.
+	Ring operations are overloaded.
+	Need to be carefull about the degree of the result.
+*/
 class POLYNOMIAL
 {
 	public:
+		//! coefficients
+		/*!
+			coefficients are stored as a std::vector<COMPLEX> coef.
+			coef[0] is the constant. coef[n] is the coefficient of x^n
+		*/
 		std::vector<COMPLEX> coef;
 		int degree;
 
-		POLYNOMIAL(int, COMPLEX *);
-		POLYNOMIAL(int, std::vector<COMPLEX>);
-		POLYNOMIAL(COMPLEX);
+		//! construction with an array of coefficients
+		/*!
+			@warning c[d] has to be nonzero; i.e., d really has to be the degree of c
+			@param d a degree of the created polynomial
+			@param c an array of coefficient where c[i] is the coef. of z^i
+		*/
+		POLYNOMIAL(int d, COMPLEX * c);
+
+		//! construction with a vector of coefficients
+		/*!
+			@warning c[d] has to be nonzero; i.e., d really has to be the degree of c
+			@param d a degree of the created polynomial
+			@param c an array of coefficient where c[i] is the coef. of z^i
+		*/
+		POLYNOMIAL(int d, std::vector<COMPLEX> c);
+
+		//! construction of a constant polynomial
+		/*!
+			@param c the value of the constant polynomial
+		*/
+		POLYNOMIAL(COMPLEX c);
 		POLYNOMIAL();
 		~POLYNOMIAL();
 		COMPLEX operator () (const COMPLEX&);
@@ -30,11 +67,33 @@ namespace internal{template <> struct is_continuous<POLYNOMIAL> : public std::tr
 int geterror_exp(const POLYNOMIAL & );
 
 // Q = deriv(P,k) := Q^{(k)}
-POLYNOMIAL deriv(POLYNOMIAL, int);
+
+/*! @brief differentiate a polynomial
+ *
+ *
+ *  @param k the number of times the differentiate op. is applied
+ *
+ *  @return p^{(k)}
+ */
+POLYNOMIAL deriv(POLYNOMIAL p, int k);
 // y = evaluate(P, x) := P(x)
-COMPLEX evaluate(POLYNOMIAL, COMPLEX);
+
+/*! @brief evaluate a polynomial at a point
+ *
+ *
+ *
+ *  @return p(x)
+ */
+COMPLEX evaluate(POLYNOMIAL p, COMPLEX x);
 // Taylor coefficients: a_k = CoefAt(P, k, z) := P^{(k)}(z)/k!
-COMPLEX CoefAt(POLYNOMIAL, int, COMPLEX);
+
+/*! @brief compute Taylor coefficient
+ *
+ *
+ *
+ *  @return p^{(k)}(z)/k!
+ */
+COMPLEX CoefAt(POLYNOMIAL p, int k, COMPLEX z);
 // Translation and dilation by g(x) = f(ax + b)
 // a : REAL, b : COMPLEX
 POLYNOMIAL translation(POLYNOMIAL , REAL , COMPLEX );
@@ -42,8 +101,14 @@ POLYNOMIAL translation(POLYNOMIAL , REAL , COMPLEX );
 
 
 // Find root
+/*! @brief find every roots of a polynomial
+ *
+ *
+ *
+ *  @return a vector of all roots of p
+ */
+std::vector<COMPLEX > roots(POLYNOMIAL p);
 
-std::vector<COMPLEX > roots(POLYNOMIAL P);
-
+/** @} */
 
 }
