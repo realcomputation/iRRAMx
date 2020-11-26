@@ -12,6 +12,14 @@ Of course, being built on iRRAM, iRRAM is a prerequisite of this library.
 The users of this library first have to install iRRAM in their system.
 Our library is, at this moment, compatible with the version of iRRAM that is accessible through a forked [Github repository](https://github.com/fbrausse/iRRAM) in the most recent commit (_`6545f78 on Mar 19, 2019`_). When iRRAM is being installed, it asks whether it will be installed directly in the system or in a local directory. For now, iRRAM_extension only detects iRRAM when it is installed in system.
 
+Also,
+
+```bash
+$ sudo apt-get install libpng-dev
+```
+
+
+
 ## Installation
 iRRAM_extension is a static C++ library. Its compilation is deferred to the users.
 When a compatible iRRAM is installed in the system, run `make` on the directory of the source directory creates a static library file in `lib/libiRRAM_extension.a`:
