@@ -61,6 +61,8 @@ Here, `compute` is a function that replaces `main` in iRRAM. The readers who are
 
 ## Reference Manual
 
+- [iRRAM_extension/polynomial.h](https://github.com/realcomputation/iRRAM_extension/wiki/iRRAM_extension-linear.h)
+
 ### iRRAM_extension/compact.hpp
 
 #### Compact
