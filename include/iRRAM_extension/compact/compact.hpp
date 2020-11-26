@@ -14,12 +14,11 @@ using namespace iRRAM;
 #define PLOT_COLOR_G    0x00
 #define PLOT_COLOR_B    0x00
 
-
-
 namespace iRRAM {
 
-
-
+/** \addtogroup compact
+*  @{
+*/
 // R^N
 template <int N>
 class Compact {
@@ -27,19 +26,40 @@ public:
   // characteristic function
   std::function< bool (Point<N> , int) > cfun;
 
-  // init with the emptyset
+
+  /*! @brief init with the emptyset
+  */
   Compact() { this->cfun = [=](Point<N>, int) -> bool { return false; }; }
 
-  // init with characteristic func
+
+  /*! @brief init with characteristic func
+  *
+  *  @param cfun the characteristic function that defines a compact set
+  */
   Compact(std::function<bool(Point<N>, int)> cfun) { this->cfun = cfun; }
 
-  // membership test for point with precision 2^-p
+
+  /*! @brief membership test for point with precision 2⁻ᴾ
+  *
+  *  @param point a point in ℝⁿ
+  *  @param p precision(higher p → higher precision)
+  *
+  *  @return the result of calling the characteristic function with \p point and \p p
+  */
   virtual bool member(Point<N> point, int p) { return this->cfun(point, p); }
 
-  // save the 2D graph to an .png file
-  // area to draw: [x1, y1] X [x2, y2]
-  // Set image width. Height will be determined automatically.
-  // REQUIRE: x1 < x2, y1 < y2
+
+  /** Save the 2D graph to an .png file
+   * 
+  *  Area to draw: [x1, y1] X [x2, y2]
+  * 
+  *  Height will be determined automatically.
+  *
+  *  @param width the image width in pixel
+  *  @param p precision(higher \p p → higher precision)
+  * 
+  *  @warning REQUIRE: \p x1 < \p x2, \p y1 < \p y2
+  */
   void plot2D(const char *filename, int width, REAL x1, REAL y1, REAL x2, REAL y2) {
     // only plane
     if(N != 2) return;
@@ -76,12 +96,18 @@ public:
     // to image
     writeImage(filename, pal);
   }
+
 };
+/** @} */
 
 
 
   
-// pointwise conjunction for binary Boolean functions
+/** \addtogroup compact
+*  @{
+*/
+/** pointwise conjunction for two compact subsets
+ */
 template <int N>
 Compact<N> conjunction(Compact<N> &com1, Compact<N> &com2) {
   auto cfun = [&] (Point<N> pt, int p) -> bool {
@@ -89,8 +115,9 @@ Compact<N> conjunction(Compact<N> &com1, Compact<N> &com2) {
   };
   return Compact<N>(cfun);
 }
-  
-// pointwise conjunction for binary Boolean functions
+
+/** pointwise disjunction for two compact subsets
+ */
 template <int N>
 Compact<N> disjunction(Compact<N> &com1, Compact<N> &com2) {
   auto cfun = [&] (Point<N> pt, int p) -> bool {
@@ -99,4 +126,5 @@ Compact<N> disjunction(Compact<N> &com1, Compact<N> &com2) {
   return Compact<N>(cfun);
 }
 
+/** @} */
 }

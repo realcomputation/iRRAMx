@@ -11,6 +11,10 @@
 
 using namespace iRRAM;
 
+/** \addtogroup path
+*  @{
+*/
+
 // [0,1] -> R^N
 template <int N>
 class Path : public Compact<N> {
@@ -18,15 +22,20 @@ public:
   // original function
   std::function<Point<N>(REAL)> f;
 
-  // init
+  /** Init with a homotopy
+   * 
+   * @param a homotopy \p f :[0,1] → ℝⁿ
+   */
   Path(std::function<Point<N>(REAL)> f) { this->f = f; }
 
   // whenever |x-z| < 2^-pArg, |f(x)-f(z)| < 2^-p for all x,z
   // will be increased when higher precision is requested
   int p=INT_MIN, pArg=INT_MIN;
 
-  // increase the current precision(from this->p to p)
-  // and find the corresponding pArg
+  /** Increase the current precision and find the corresponding \p pArg
+   * 
+   * @param p target precision(higher \p p → higher precision)
+   */
   void increasePrecision(int p) {
     // ignore lower or equal precision
     if(this->p >= p) return;
@@ -66,8 +75,13 @@ public:
     };
   }
   
-  // membership test for point with precision 2^-p
-  // in accordance to the Ko compatibility
+  /** membership test for point with precision 2⁻ᴾ
+   * 
+   * If the current precision is not enough, it will increase, and then do membership test.
+   * 
+   * @param point a point in ℝⁿ
+   * @param p target precision(higher \p p → higher precision)
+   */
   bool member (Point<N> point, int p) {
     // cout << "member in path p = " << p << "\n";
 
@@ -78,3 +92,5 @@ public:
     return this->cfun(point, p);
   }
 };
+
+/** @} */
