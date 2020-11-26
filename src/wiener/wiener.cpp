@@ -43,11 +43,11 @@ namespace iRRAM{
         probPrec=50;
     }
 
-    WIENER::WIENER(int pBound)
+    WIENER::WIENER(int p)
     {
         X_0=gaussian_real();
         curPrec= actual_stack().actual_prec;
-        probPrec=pBound;
+        probPrec=p;
     }
 
     int WIENER::modulus(int prec1,int prec2)
