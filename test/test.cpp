@@ -1,6 +1,19 @@
 #include <iRRAM.h>
-#include "iRRAM_extension/compact.hpp"
+#include "iRRAM_extension/utility.hpp"
+#include "iRRAM_extension/wiener.hpp"
+// #include<pair.h>
+using namespace iRRAM;
+
+
+std::function <REAL(REAL)> join (REAL x, std::function<REAL(REAL)> f, std::function<REAL(REAL)> g)
+{
+    return ([=](REAL m)->REAL { return iRRAM::glue (m<x, f(m), g(m)); });
+}
+
 
 void compute () {
-  iRRAM::cout << func1(1,2) << "\n";
+  WIENER w1;
+  cout<<w1.compute(0.1)<<"\n";
+  cout<<w1.compute(0.2)<<"\n";
+  cout<<w1.compute(0.3)<<"\n";
 }
