@@ -107,74 +107,6 @@ Here, `compute` is a function that replaces `main` in iRRAM. The readers who are
 > **returns** a surface(defined by *f*)
 
 
-### iRRAM_extension/linear.hpp
-- `std::string to_string_double (REALMATRIX M)`
-
-> **returns** s : std::string for a double precision approximation of M printed in Matlab format
-
-- `REALMATRIX transpose (REALMATRIX M)`
-
-> **returns** the transpose of M
-
-- `REALMATRIX trace (REALMATRIX M)`
-
-> **returns** tr : REAL which is the trace of M
-
-- `block_matrix(REALMATRIX A, const REALMATRIX B, const REALMATRIX C, const REALMATRIX D)`
-
-> **returns** [A B ; C D] : REALMATRIX
-
-- `REALMATRIX block_diag_matrix(REALMATRIX A, const REALMATRIX B)`
-
-> **returns** [A 0 ; 0 B] : REALMATRIX
-
-
-- `REALMATRIX strassen(const REALMATRIX A, const REALMATRIX B)`
-
-> **returns** A * B computed using Strassen algorithm; c.f., in iRRAM the expression A*B is implemented via highschool method.
-
-#### decompositions
-
-- `std::pair<REALMATRIX, REALMATRIX> QR(REALMATRIX X)`
-
-> **returns** (Q, R) : std::pair<REALMATRIX, REALMATRIX> which is a QR decomposition of X. Currently this is implemented
-using Householder reflector method. ***This is partially defined***
-
-- `std::pair<REALMATRIX, REALMATRIX> QR_H(REALMATRIX X)`
-
-> **returns** (Q, R) : std::pair<REALMATRIX, REALMATRIX> which is a QR decomposition of a Hessenberg matrix X.
-Currently this is implemented using Givens rotation method. ***This is partially defined***
-
-#### reductions
-
-- `REALMATRIX hessenberg_reduction(REALMATRIX X, int p)`
-
-> **returns** M : REALMATRIX similar to a matrix whose eigenvalues are perturbed to the eigenvalues of X at most by 2^p.
-The input p is supposed to be negative.
-
-#### linear system
-
-- `REAL det(REALMATRIX X)`
-
-> **returns** the determinant of the square matrix X. (uses Hadamard bound and
-Gaussian algorithm)
-
-- `REALMATRIX inv(REALMATRIX X)`
-
-> **returns** M : REALMATRIX which is the multiplicative inverse X. ***This is partially defined***
-
-- `REALMATRIX kernel(REALMATRIX X, int k)`
-
-> **returns** C : REALMATRIX which consists of k orthogonal column vectors which span the k dimensional kernel of X.
-
-- `REALMATRIX linear_sys`
-
-#### Eigenproblem
-
-- `std::vector<REAL> symm_eig (REALMATRIX X)`
-
-> **returns** V : std::vector<REAL> whose elements are the eigenvalues of X by 2^k when X is symmetric.
-
 ### iRRAM_extension/polynomial.hpp
 
 ### iRRAM_extension/random.hpp
@@ -245,7 +177,7 @@ Due to the lack of any up-to-date documentation for it, we put some simple note 
 
 ## Installation
 Though the official release can be found in the [official website](http://irram.uni-trier.de),
-we (recommend to) use the recent version of it that can be found in their [github](https://github.com/norbert-mueller/iRRAM). Once the repository is cloned, run `./QUICKINSTALL_run_me`. It requires some autotools to be installed. (_please write which of those are required precisely_.)
+we (recommend to) use the recent version of it that can be found in their [github](https://github.com/fbrausse/iRRAM). Once the repository is cloned, run `./QUICKINSTALL_run_me`. It requires some autotools to be installed. (_please write which of those are required precisely_.)
 
 Besides of those arbitrary installation related dependencies, it requires MPFR and GMP libraries installed.
 
