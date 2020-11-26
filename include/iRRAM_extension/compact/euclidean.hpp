@@ -84,7 +84,7 @@ int module(std::function<REAL(REAL)> f, const REAL &x, int p)
   //  2^{p-1} from d, hence |f(x)-f(z)|<=2^p
 
   int result;
-  if ((ACTUAL_STACK.inlimit == 0) && iRRAM_thread_data_address->cache_i.get(result))
+  if (get_cached(result))
     return result;
 
   DYADIC d;
@@ -105,7 +105,7 @@ int module(std::function<REAL(REAL)> f, const REAL &x, int p)
   // We now try to find the smallest p_arg such that the evaluation of f(x+- 2^p_arg)
   // is possible up to an error of at most  2^{p-1}
 
-  ITERATION_STACK SAVED_STACK;
+  // ITERATION_STACK SAVED_STACK;
 
   // To do this, we start with p_arg=p.
   // If this is successfull, we increase the value of p_arg until the first failure
@@ -120,7 +120,7 @@ int module(std::function<REAL(REAL)> f, const REAL &x, int p)
     x_copy.seterror(argerror);
     x_copy.adderror(testerror);
     bool fail = false;
-    if (iRRAM_unlikely(iRRAM_debug > 0))
+    if (iRRAM_unlikely(state->debug > 0))
     {
       sizetype x_error;
       x_copy.geterror(x_error);
@@ -131,7 +131,7 @@ int module(std::function<REAL(REAL)> f, const REAL &x, int p)
     {
       single_valued code;
       REAL z = f(x_copy);
-      if (iRRAM_unlikely(iRRAM_debug > 0))
+      if (iRRAM_unlikely(state->debug > 0))
       {
         sizetype z_error;
         z.geterror(z_error);
@@ -187,8 +187,7 @@ int module(std::function<REAL(REAL)> f, const REAL &x, int p)
   }
 
   result = argerror.exponent;
-  if (ACTUAL_STACK.inlimit == 0)
-    iRRAM_thread_data_address->cache_i.put(result);
+  put_cached(result);
   return result;
 }
 

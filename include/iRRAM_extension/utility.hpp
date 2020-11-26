@@ -1,4 +1,5 @@
 #pragma once
+#include "iRRAM_extension/fix.hpp"
 
 #include <iRRAM/lib.h>
 
