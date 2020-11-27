@@ -1,4 +1,4 @@
-#include "iRRAM_extension/polynomial/rcomplex.hpp"
+#include "iRRAMx/polynomial/rcomplex.hpp"
 #include "iRRAM/lib.h"
 #include "iRRAM/core.h"
 #include <stdexcept>

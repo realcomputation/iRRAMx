@@ -11,7 +11,7 @@ the header file defines subsets of complex planes:
 
 #include "iRRAM/lib.h"
 #include "iRRAM/core.h"
-#include "iRRAM_extension/polynomial/rcomplex.hpp"
+#include "rcomplex.hpp"
 
 #include <utility>
 using namespace iRRAM;

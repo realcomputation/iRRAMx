@@ -1,4 +1,4 @@
-#include "iRRAM_extension/wiener.hpp"
+#include "iRRAMx/wiener.hpp"
 
 using namespace iRRAM;
 
@@ -25,13 +25,13 @@ REAL chauder(REAL x, int n, INTEGER k)
    ____________________
         1   2   3
   */
-} 
+}
 
 namespace iRRAM{
 
     REAL WIENER::getX(int n,int k)
     {
-        if(X.count(std::make_pair(n,k)) ==0) 
+        if(X.count(std::make_pair(n,k)) ==0)
             X[std::make_pair(n,k)]=gaussian_real();
         return X[std::make_pair(n,k)];
     }
@@ -67,11 +67,11 @@ namespace iRRAM{
         REAL Y;
         int N=modulus(curPrec,probPrec);
         REAL result=X_0*t;
-        //W_N construction. 
+        //W_N construction.
         for(int n=1;n<=N;n++)
         {
             // Only need to consider (k-1)/2^n <= t <= (k+1)/2^n
-            // In other word, (2^n)*t - 1 <= k <= (2^n)*t + 1 
+            // In other word, (2^n)*t - 1 <= k <= (2^n)*t + 1
             INTEGER k= (prec(n)*t).as_INTEGER();
             result += getX(n,int(k-1))*chauder(t,n,k-1)  ;
             result += getX(n,int(k))*chauder(t,n,k)  ;

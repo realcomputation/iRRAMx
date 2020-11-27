@@ -1,8 +1,8 @@
 #pragma once
 
 #include <iRRAM/lib.h>
-#include "iRRAM_extension/random/random-core.hpp"
-#include "iRRAM_extension/random/random-real.hpp"
+#include "iRRAMx/random/random-core.hpp"
+#include "iRRAMx/random/random-real.hpp"
 
 using namespace iRRAM;
 namespace iRRAM{
@@ -16,7 +16,7 @@ namespace iRRAM{
 //! Gaussian symmetric matrix sampler
 /*!
     returns nXn symmetric matrix whose entry follows normal distribution i.i.d.
-*/ 
+*/
 REALMATRIX gaussian_symmetric_matrix(unsigned int n);
 
 //! Gaussian assymmetric matrix sampler

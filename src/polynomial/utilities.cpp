@@ -1,4 +1,4 @@
-#include "iRRAM_extension/polynomial/utilities.hpp"
+#include "iRRAMx/polynomial/utilities.hpp"
 #include "iRRAM/lib.h"
 #include "iRRAM/core.h"
 

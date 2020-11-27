@@ -6,9 +6,9 @@
  */
 
 
-#include "iRRAM_extension/fix.hpp"
+#include "fix.hpp"
 
 #include "random/random-real.hpp"
 #include "random/random-complex.hpp"
 #include "random/random-matrix.hpp"
-#include "iRRAM_extension/wiener.hpp"
+#include "wiener.hpp"

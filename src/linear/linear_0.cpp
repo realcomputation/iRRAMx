@@ -1,7 +1,7 @@
 // #include <iRRAM.h>
 #include <cassert>
 
-#include "iRRAM_extension/linear.hpp"
+#include "iRRAMx/linear.hpp"
 
 using namespace iRRAM;
 namespace iRRAM{

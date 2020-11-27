@@ -1,8 +1,8 @@
 #pragma once
 
 #include <iRRAM/lib.h>
-#include "iRRAM_extension/random/random-core.hpp"
-#include "iRRAM_extension/random/random-real.hpp"
+#include "iRRAMx/random/random-core.hpp"
+#include "iRRAMx/random/random-real.hpp"
 
 using namespace iRRAM;
 namespace iRRAM{

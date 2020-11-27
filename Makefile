@@ -11,11 +11,11 @@ LIB_DIR = ./lib
 # all cpp files
 SRC_CPP_FILES := $(wildcard ./src/*/*.cpp)
 SRC_OBJ_FILES := $(subst .cpp,.o,$(SRC_CPP_FILES))
-INC_HPP_FILES := $(wildcard ./include/iRRAM_extension/*.hpp) $(wildcard ./include/iRRAM_extension/*/*.hpp)
+INC_HPP_FILES := $(wildcard ./include/iRRAMx/*.hpp) $(wildcard ./include/iRRAMx/*/*.hpp)
 
 ##########
 # target is the library file
-MAIN = $(LIB_DIR)/libiRRAM_extension.a
+MAIN = $(LIB_DIR)/libiRRAMx.a
 
 all: $(MAIN)
 
@@ -39,7 +39,7 @@ lib:
 TESTDIR = ./test
 
 test:
-	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test.cpp -L./$(LIB_DIR) -liRRAM_extension $(LIBS) -o $(TESTDIR)/test
+	g++ $(CPPFLAGS) $(INCLUDES) $(TESTDIR)/test.cpp -L./$(LIB_DIR) -liRRAMx $(LIBS) -o $(TESTDIR)/test
 
 
 

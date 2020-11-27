@@ -1,5 +1,5 @@
-# iRRAM_extensionn
-iRRAM_extension is a static C++ library that provides functionalities for rigorous scientific computation.
+# iRRAMxn
+iRRAMx is a static C++ library that provides functionalities for rigorous scientific computation.
 It is designed in the way that it extends iRRAM.
 (See )
 iRRAM is another C++ library that provides exact real-number computation.
@@ -10,7 +10,7 @@ Going beyond and based on those primitive operations, this extension provides mo
 ## Prerequisite
 Of course, being built on iRRAM, iRRAM is a prerequisite of this library.
 The users of this library first have to install iRRAM in their system.
-Our library is, at this moment, compatible with the version of iRRAM that is accessible through a forked [Github repository](https://github.com/fbrausse/iRRAM) in the most recent commit (_`6545f78 on Mar 19, 2019`_). When iRRAM is being installed, it asks whether it will be installed directly in the system or in a local directory. For now, iRRAM_extension only detects iRRAM when it is installed in system.
+Our library is, at this moment, compatible with the version of iRRAM that is accessible through a forked [Github repository](https://github.com/fbrausse/iRRAM) in the most recent commit (_`6545f78 on Mar 19, 2019`_). When iRRAM is being installed, it asks whether it will be installed directly in the system or in a local directory. For now, iRRAMx only detects iRRAM when it is installed in system.
 
 Also,
 
@@ -21,25 +21,25 @@ $ sudo apt-get install libpng-dev
 
 
 ## Installation
-iRRAM_extension is a static C++ library. Its compilation is deferred to the users.
-When a compatible iRRAM is installed in the system, run `make` on the directory of the source directory creates a static library file in `lib/libiRRAM_extension.a`:
+iRRAMx is a static C++ library. Its compilation is deferred to the users.
+When a compatible iRRAM is installed in the system, run `make` on the directory of the source directory creates a static library file in `lib/libiRRAMx.a`:
 
 ```
 % mkdir ~/git_dir
 % cd ~/git_dir
-% git clone https://github.com/realcomputation/iRRAM_extension.git
+% git clone https://github.com/realcomputation/iRRAMx.git
 % cd git_dir
 % make
 ```
 
-When building the library is complete, the library can be either included in the system. Or, the library and the header files can be linked each time when a C++ code using iRRAM_extension library is used:
+When building the library is complete, the library can be either included in the system. Or, the library and the header files can be linked each time when a C++ code using iRRAMx library is used:
 
 ```
-% g++ -std=c++14 -O2 -Wall -I~/git_dir/iRRAM_extension/include -L~/git_dir/iRRAM_extension/lib -liRRAM_extension -liRRAM -lmpfr -gmp my_cpp.cpp -o my_out
+% g++ -std=c++14 -O2 -Wall -I/path/to/git_dir/iRRAMx/include -L/path/to/git_dir/iRRAMx/lib -liRRAMx -liRRAM -lmpfr -lgmp my_cpp.cpp -o my_out
 ```
 
-## Using iRRAM_extension
-iRRAM_extension consists of orthogonal components:
+## Using iRRAMx
+iRRAMx consists of orthogonal components:
 - compact:
 - linear: linear algebra including fast matrix multiplication, matrix eigenproblem, ...
 - polynomial:
@@ -50,7 +50,7 @@ When a component is going to be used, the corresponding header file should be us
 For example, when the user want to have infinite precision random number,
 ```
 #include <iRRAM.h>
-#include "iRRAM_extension/random.hpp"
+#include "iRRAMx/random.hpp"
 
 void compute(){
   REAL x = Gaussian(); // A real number sampled from the normal distribution
@@ -61,9 +61,9 @@ Here, `compute` is a function that replaces `main` in iRRAM. The readers who are
 
 ## Reference Manual
 
-- [iRRAM_extension/polynomial.h](https://github.com/realcomputation/iRRAM_extension/wiki/iRRAM_extension-linear.h)
+- [iRRAMx/polynomial.h](https://github.com/realcomputation/iRRAMx/wiki/iRRAMx-linear.h)
 
-### iRRAM_extension/compact.hpp
+### iRRAMx/compact.hpp
 
 #### Compact
 
@@ -109,9 +109,9 @@ Here, `compute` is a function that replaces `main` in iRRAM. The readers who are
 > **returns** a surface(defined by *f*)
 
 
-### iRRAM_extension/polynomial.hpp
+### iRRAMx/polynomial.hpp
 
-### iRRAM_extension/random.hpp
+### iRRAMx/random.hpp
 #### random real numbers
 - `REAL uniform_real()`
 
@@ -156,18 +156,18 @@ Here, `compute` is a function that replaces `main` in iRRAM. The readers who are
 
 > **returns** a $n \times n$ random orthogonal matrix which follows Haar distribution in $O(n)$. See _[Stewart, Gilbert W. "The efficient generation of random orthogonal matrices with an application to condition estimators." SIAM Journal on Numerical Analysis 17.3 (1980): 403-409.]_ for more detail.
 
-### iRRAM_extension/plot.hpp
+### iRRAMx/plot.hpp
 
-## Contributing to iRRAM_extension
+## Contributing to iRRAMx
 This section is for those who want to contribute to this library.
 For the purpose, we introduce the structure of this library.
 
 This library consists of multiple sublibraries. (Here, sublibrary is not a technical term.. It means header files that the users will separately include in their applications.)
-For each sublibrary, its public header file must stay in `./include/iRRAM_extension`, its header files that are used internally
-must stay in its own directory in `./include/iRRAM_extension`, and its source codes must say in its own directory in `./src`.
+For each sublibrary, its public header file must stay in `./include/iRRAMx`, its header files that are used internally
+must stay in its own directory in `./include/iRRAMx`, and its source codes must say in its own directory in `./src`.
 
-For example, the public header file of _polynomial_ can be found in `./include/iRRAM_extension/polynomial.h`.
-Some header files of _polynomial_ that are used only internally can be found in `./include/iRRAM_extension/polynomial/`.
+For example, the public header file of _polynomial_ can be found in `./include/iRRAMx/polynomial.h`.
+Some header files of _polynomial_ that are used only internally can be found in `./include/iRRAMx/polynomial/`.
 The C++ source codes of _polynomial_ can be found in `./src/polynomial`.
 
 New sublibraries can be freely created following the above organization. If the organizational requirement is satisfied, `make` will do every work for the compilation.

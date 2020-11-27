@@ -1,5 +1,5 @@
 #pragma once
-#include "iRRAM_extension/fix.hpp"
+#include "fix.hpp"
 // iRRAM extension for compact subsets in euclidean
 // author: Jiman Hwang(molehair a.t kaist.ac.kr)
 

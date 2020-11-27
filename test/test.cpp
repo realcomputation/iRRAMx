@@ -1,6 +1,6 @@
 #include <iRRAM.h>
-#include "iRRAM_extension/utility.hpp"
-#include "iRRAM_extension/wiener.hpp"
+#include "iRRAMx/utility.hpp"
+#include "iRRAMx/wiener.hpp"
 // #include<pair.h>
 using namespace iRRAM;
 

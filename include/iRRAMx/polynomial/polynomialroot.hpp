@@ -5,8 +5,8 @@ the header file defines programs for approximating roots of a complex polynomial
 
 #include "iRRAM/lib.h"
 #include "iRRAM/core.h"
-#include "iRRAM_extension/polynomial.hpp"
-#include "iRRAM_extension/polynomial/rcomplex.hpp"
+#include "iRRAMx/polynomial.hpp"
+#include "rcomplex.hpp"
 
 #include <utility>
 using namespace iRRAM;

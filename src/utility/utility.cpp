@@ -1,6 +1,6 @@
 
 
-#include "iRRAM_extension/utility.hpp"
+#include "iRRAMx/utility.hpp"
 
 using namespace iRRAM;
 namespace iRRAM{

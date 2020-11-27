@@ -6,7 +6,7 @@ the header file define some basic utilities (funcitons) which is no included in 
 #include "iRRAM/lib.h"
 #include "iRRAM/core.h"
 // #include "intervals.h"
-#include "iRRAM_extension/polynomial.hpp"
+#include "iRRAMx/polynomial.hpp"
 
 #include <utility>
 using namespace iRRAM;

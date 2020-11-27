@@ -1,4 +1,4 @@
-#include "iRRAM_extension/random.hpp"
+#include "iRRAMx/random.hpp"
 using namespace iRRAM;
 
 namespace iRRAM{

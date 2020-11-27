@@ -1,12 +1,12 @@
 #pragma once
-#include "iRRAM_extension/fix.hpp"
+#include "fix.hpp"
 // iRRAM extension for linear algebra.
 
 
 #include <iRRAM/lib.h>
 #include <vector>
 
-#include "iRRAM_extension/utility.hpp"
+#include "utility.hpp"
 
 using namespace iRRAM;
 namespace iRRAM{

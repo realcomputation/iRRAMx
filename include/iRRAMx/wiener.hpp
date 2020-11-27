@@ -1,6 +1,6 @@
 #pragma once
-#include "iRRAM_extension/random.hpp"
-#include "iRRAM_extension/utility.hpp"
+#include "random.hpp"
+#include "utility.hpp"
 #include<functional>
 #include<map>
 using namespace iRRAM;

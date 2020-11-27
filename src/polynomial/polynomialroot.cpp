@@ -1,8 +1,8 @@
-#include "iRRAM_extension/polynomial/polynomialroot.hpp"
-#include "iRRAM_extension/polynomial/complexplane.hpp"
-#include "iRRAM_extension/polynomial.hpp"
-#include "iRRAM_extension/polynomial/utilities.hpp"
-#include "iRRAM_extension/utility.hpp"
+#include "iRRAMx/polynomial/polynomialroot.hpp"
+#include "iRRAMx/polynomial/complexplane.hpp"
+#include "iRRAMx/polynomial.hpp"
+#include "iRRAMx/polynomial/utilities.hpp"
+#include "iRRAMx/utility.hpp"
 
 #include "iRRAM/lib.h"
 #include "iRRAM/core.h"

@@ -1,6 +1,6 @@
 // #include <iRRAM.h>
 
-#include "iRRAM_extension/compact.hpp"
+#include "iRRAMx/compact.hpp"
 
 using namespace iRRAM;
 
