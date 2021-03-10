@@ -8,6 +8,7 @@ test/test_polynomial
 test/test_random
 test/test_plot
 
+.vscode
 .DS_Store
 ._.DS_Store
 **/.DS_Store
