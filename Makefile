@@ -113,4 +113,4 @@ test_plot:
 # clean
 .PHONY : clean test test_linear test_compact test_polynomial test_random test_plot
 clean:
-	-rm $(SRC_OBJ_FILES) $(ALL_LIBS)
+	-rm $(SRC_OBJ_FILES) $(ALL_LIBS) -f
