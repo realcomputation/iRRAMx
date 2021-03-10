@@ -22,11 +22,11 @@ namespace iRRAM {
 // R^N
 template <int N>
 class Compact {
-public:
+protected:
   // characteristic function
   std::function< bool (Point<N> , int) > cfun;
 
-
+public:
   /*! @brief init with the emptyset
   */
   Compact() { this->cfun = [=](Point<N>, int) -> bool { return false; }; }
@@ -60,7 +60,7 @@ public:
   * 
   *  @warning REQUIRE: \p x1 < \p x2, \p y1 < \p y2
   */
-  void plot2D(const char *filename, int width, REAL x1, REAL y1, REAL x2, REAL y2) {
+  virtual void plot2D(const char *filename, int width, DYADIC x1, DYADIC y1, DYADIC x2, DYADIC y2) {
     // only plane
     if(N != 2) return;
 
@@ -69,10 +69,7 @@ public:
     int height = ceil(((y2-y1)/pixelSize).as_double());               // image height
 
     // precision
-    // Define p such that a ball centered at the center of pixel cover the pixel
-    // That is, pixelSize/2*sqrt(2)  <  2^-p (radius of ball)
-    // The drawn path will not be broken.
-    int p = floor((REAL(0.5) - log(pixelSize)/ln2()).as_double());       // precision
+    int p = floor((REAL(0.5) - log(pixelSize)/ln2()).as_double());
 
     // plot each pixel to palette
     // start at the bottom row, from left to right.. row += 1 .. repeat
@@ -89,14 +86,11 @@ public:
         }
         point[0] += pixelSize;
       }
-
-      cout << (height-i) << " / " << height << " row done\n";
     }
 
     // to image
     writeImage(filename, pal);
   }
-
 };
 /** @} */
 
@@ -106,15 +100,7 @@ public:
 /** \addtogroup compact
 *  @{
 */
-/** pointwise conjunction for two compact subsets
- */
-template <int N>
-Compact<N> conjunction(Compact<N> &com1, Compact<N> &com2) {
-  auto cfun = [&] (Point<N> pt, int p) -> bool {
-    return com1.member(pt, p) && com2.member(pt, p);
-  };
-  return Compact<N>(cfun);
-}
+
 
 /** pointwise disjunction for two compact subsets
  */
