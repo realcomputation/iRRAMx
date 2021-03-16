@@ -14,10 +14,9 @@ using namespace iRRAM;
 #include "plot.hpp"
 #include "etc.hpp"
 
-#include <unordered_set>
-
 // 
-#define MIN_PREC_THRES 5
+#define MAX_ERROR_SIZE sizetype_power2(-5)
+// #define MAX_ERROR_SIZE scale(-5)
 
 namespace iRRAM {
 
@@ -43,14 +42,9 @@ public:
   Homotopy(std::function<Point<N>(Point<M>)> f) {
     // set the homotopy
     orig_f = f;
-
-    // // init precision
-    // init_prec();
   }
 
-
   std::function<Point<N>(Point<M>)> get_f() { return orig_f; }
-
   
   /** membership test for point with precision 2⁻ᴾ
    * 
@@ -60,8 +54,11 @@ public:
    * @param p target precision(higher \p p → higher precision)
    */
   bool member(Point<N> x, prec_t p) {
+    // increase the computable precision
+    increaseAvailablePrecision(p);
+
+    // start with unit cell
     Cell<M> unitCell;
-    unitCell.makeUnitCell();
     return member_(x, p, unitCell);
   }
   
@@ -83,7 +80,7 @@ public:
 
     // 
     // REAL pixelSize = (x2-x1)/width;
-    int height = ((y2-y1)/(x2-x1)*width+REAL(0.5)).as_INTEGER();               // image height
+    int height = ((y2-y1)/(x2-x1)*width+RATIONAL(1,2)).as_INTEGER();               // image height
 
     // eval
     pal = new Palette(width, height);
@@ -92,7 +89,6 @@ public:
     this->y1 = y1.as_DYADIC();
     this->y2 = y2.as_DYADIC();
     Cell<M> unitCell;
-    unitCell.makeUnitCell();
     plot2D_(unitCell);
 
     // to image
@@ -103,12 +99,10 @@ public:
 
 private:
   bool member_(Point<N> &x, prec_t p, Cell<M> &H) {
-    cout << H.prec << ": " << H[0] << " " << H[1] << "\n";
-
-    if(H.prec >= MIN_PREC_THRES) {
+    if(sizetype_less(H[0].geterror(), MAX_ERROR_SIZE)) {
       // get the image of the cell
       HyperCube<N> fH = f(H);
-      
+
       //
       REAL d=INTEGER(0),r=INTEGER(0);
       sizetype exactErr;
@@ -140,16 +134,15 @@ private:
     //
     Acc b(M, 2);
     Cell<M> HH;
-    HH.prec = H.prec+1;
     do {
-      for(int j=0;j<M;j++) HH[j] = 2*H[j]+b[j];
+      HH = H.halfCell(b);
       if(member_(x, p, HH)) return true;
     } while(!b.inc());
     return false;
   }
 
   void plot2D_(Cell<M> &H) {
-    if(H.prec >= MIN_PREC_THRES) {
+    if(sizetype_less(H[0].geterror(), MAX_ERROR_SIZE)) {
       HyperCube<N> fH = f(H);
 
       // compute the boundary of fH
@@ -187,35 +180,14 @@ private:
     //
     Acc b(M, 2);
     Cell<M> HH;
-    HH.prec = H.prec+1;
     do {
-      for(int j=0;j<M;j++) HH[j] = 2*H[j]+b[j];
+      HH = H.halfCell(b);
       plot2D_(HH);
     } while(!b.inc());
   }
 
   Point<N> f(Point<M> &x) { return orig_f(x); }
-  HyperCube<N> f(Cell<M> &H) {
-    // convert H into the REAL cell H
-    HyperCube<M> realH;
-    sizetype err;
-    err = sizetype_power2(-H.prec-1);     // 2^(-t-1)
-    for(int j=0;j<M;j++) {
-      realH[j] = DYADIC(2*H[j]+1) * scale(-H.prec-1);   // (2i_j+1)/2^(t+1)
-      realH[j].seterror(err);
-    }
-
-    // get the image of the cell
-    // cout << "1";
-    HyperCube<N> fH;
-    {
-      single_valued code;
-      fH = orig_f(realH);
-    }
-    // cout << "2\n";
-
-    return fH;
-  }
+  HyperCube<N> f(Cell<M> &H) { return orig_f(H.H); }
 };
 
 

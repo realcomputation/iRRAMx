@@ -4,6 +4,7 @@
 
 #include <iRRAM/lib.h>
 #include "plot.hpp"
+#include "etc.hpp"
 
 
 using namespace iRRAM;
@@ -48,49 +49,64 @@ DYADIC scale(int n) {
   else return DYADIC(1) / DYADIC(INTEGER(1) << -n);
 }
 
-template <int N>
-class Cell {
-public:
-  prec_t prec;
-  IntegerPoint<N> coord;
-
-  // // the squared distance between two cells
-  // static DYADIC distance2(Cell<N> &x, Cell<N> &y) {
-  //   DYADIC dist2 = 0;
-  //   DYADIC t1, t2;
-    
-  //   for(int j=0;j<N;j++) {
-  //     t1 = scale(-x.prec-1) * ((x.coord[j]<<1)+1);
-  //     t2 = scale(-y.prec-1) * ((y.coord[j]<<1)+1);
-  //     dist2 = dist2 + (t1-t2)*(t1-t2);
-  //   }
-  //   return dist2;
-  // }
-
-  // set this instance to [0,1]^N
-  void makeUnitCell() {
-    prec = 0;
-    for(int j=0;j<N;j++) coord[j] = 0;
-  }
-
-  INTEGER& operator[](int i) { return coord[i]; }
-};
-
 
 //
-DYADIC errSize(REAL &r) {
-  sizetype err;
-  r.geterror(err);
+inline DYADIC toDYADIC(sizetype &err) {
   sizetype_normalize(err);
   return scale(err.exponent) * int(err.mantissa);
 }
 
 //
-template <int N>
-void exactify(HyperCube<N> &hc) {
+inline DYADIC errSize(REAL &r) {
   sizetype err;
-  sizetype_exact(err);
-  for(int i=0;i<N;i++) hc[i].seterror(err);
+  r.geterror(err);
+  return toDYADIC(err);
 }
 
+//
+void exactify(REAL &r) {
+  sizetype err;
+  sizetype_exact(err);
+  r.seterror(err);
+}
+
+//
+template <int N>
+void exactify(HyperCube<N> &hc) {
+  for(int i=0;i<N;i++) exactify(hc[i]);
+}
+
+
+template <int N>
+class Cell {
+public:
+  HyperCube<N> H;
+
+  Cell() {
+    // set this instance to [0,1]^N
+    sizetype err;
+    err = sizetype_power2(-1);
+    for(int j=0;j<N;j++) {
+      H[j] = RATIONAL(1,2);
+      H[j].seterror(err);
+    }
+  }
+
+  // 
+  inline Cell halfCell(Acc &acc) {
+    sizetype err;
+    Cell<N> HH;
+    for(int i=0;i<N;i++) {
+      H[i].geterror(err);
+      sizetype_half(err,err);
+      HH[i] = H[i];
+      exactify(HH[i]);
+      HH[i] = HH[i] + toDYADIC(err) * ((acc[i]<<1)-1);
+      HH[i].seterror(err);
+    }
+    return HH;
+  }
+  
+  REAL& operator[](int i) { return H[i]; }
+};
 }

@@ -32,3 +32,11 @@ public:
 
   int &operator[](int i) { return acc[i]; }
 };
+
+
+// increase the internal precision in iRRAM
+// so that we can compute value with error <= 2^-p
+void increaseAvailablePrecision(int p) {
+  REAL r = pi();
+  DYADIC d = r.as_DYADIC(-p-1);
+}
