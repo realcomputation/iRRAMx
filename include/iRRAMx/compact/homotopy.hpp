@@ -74,37 +74,38 @@ public:
   *  @warning REQUIRE: \p x1 < \p x2, \p y1 < \p y2
   *  @warning Previously computed data will be reset for the exact drawing.
   */
-  void plot2D(const char *filename, int width, REAL x1, REAL y1, REAL x2, REAL y2) {
+  void plot2D(Palette &pal, int width, REAL x1, REAL y1, REAL x2, REAL y2) {
     // plane only
-    if(N != 2) return;
+    assert(N==2);
+    
+    // need an uninitialized palette
+    assert(pal.width==0);
 
-    // 
-    // REAL pixelSize = (x2-x1)/width;
-    int height = ((y2-y1)/(x2-x1)*width+RATIONAL(1,2)).as_INTEGER();               // image height
+    // image height
+    int height = ((y2-y1)/(x2-x1)*width+RATIONAL(1,2)).as_INTEGER();
 
     // eval
-    pal = new Palette(width, height);
+    if(pal.width == 0) pal.init(width, height);
+    this->pal = &pal;
     this->x1 = x1.as_DYADIC();
     this->x2 = x2.as_DYADIC();
     this->y1 = y1.as_DYADIC();
     this->y2 = y2.as_DYADIC();
     Cell<M> unitCell;
-    plot2D_(unitCell);
-
-    // to image
-    writeImage(filename, *pal);
-
-    delete pal;
+    _plot2D(unitCell);
   }
 
 private:
+  // check if x is in f(H) with respect to the precision p
   bool member_(Point<N> &x, prec_t p, Cell<M> &H) {
     if(sizetype_less(H[0].geterror(), MAX_ERROR_SIZE)) {
       // get the image of the cell
       HyperCube<N> fH = f(H);
 
-      //
-      REAL d=INTEGER(0),r=INTEGER(0);
+      // get the distances
+      // d: the distance between x and the center of H
+      // r: the half length of diagonal of H
+      REAL d=INTEGER(0), r=INTEGER(0);
       sizetype exactErr;
       sizetype_exact(exactErr);
       for(int i=0;i<N;i++) {
@@ -116,22 +117,22 @@ private:
         fH[i].seterror(exactErr);
         d += (x[i]-fH[i])*(x[i]-fH[i]);
       }
-      r = sqrt(r);
-      d = sqrt(d);
+      r = root(r, N);
+      d = root(d, N);
       
-      //
+      // check the membership
       DYADIC b1 = scale(-p);
       DYADIC b2 = 2*b1;
       DYADIC offset = b1/4;
       bool isOut = (choose(d-r>b1, d-r<b1+offset) == 1);
       bool isIn = (choose(d+r<b2, d+r>b2-offset) == 1);
 
-      //
+      // return!
       if(isOut) return false;
       if(isIn) return true;
     }
 
-    //
+    // delve into sub-hypercubes of H
     Acc b(M, 2);
     Cell<M> HH;
     do {
@@ -141,7 +142,8 @@ private:
     return false;
   }
 
-  void plot2D_(Cell<M> &H) {
+  // plot f(H)
+  void _plot2D(Cell<M> &H) {
     if(sizetype_less(H[0].geterror(), MAX_ERROR_SIZE)) {
       HyperCube<N> fH = f(H);
 
@@ -161,7 +163,6 @@ private:
       isOut |= (choose(v2 < y1, y1 < v2+yHalfSize/2) == 1);
       if(isOut) return;
 
-
       // fH is small enough?
       if(xHalfSize*2*pal->width <= x2-x1 && yHalfSize*2*pal->width <= x2-x1) {
         // reference point to color
@@ -177,12 +178,12 @@ private:
       }
     }
 
-    //
+    // delve into sub-hypercubes of H
     Acc b(M, 2);
     Cell<M> HH;
     do {
       HH = H.halfCell(b);
-      plot2D_(HH);
+      _plot2D(HH);
     } while(!b.inc());
   }
 
