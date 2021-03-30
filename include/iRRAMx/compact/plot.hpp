@@ -6,11 +6,14 @@
 
 class Palette {
 public:
-  int width;
-  int height;
+  int width=0;
+  int height=0;
   png_bytepp data;
 
-  Palette(int width, int height) {
+	Palette() {}
+	Palette(int width, int height) { init(width, height); }
+
+  void init(int width, int height) {
     this->width = width;
     this->height = height;
     this->data = new png_bytep [height];
@@ -22,8 +25,10 @@ public:
     }
   }
   ~Palette() {
-    for(int i=0;i<height;i++) delete this->data[i];
-    delete this->data;
+		if(width || height) {
+			for(int i=0;i<height;i++) delete this->data[i];
+			delete this->data;
+		}
   }
 
   // x,y starts with 0
@@ -32,6 +37,22 @@ public:
     this->data[y][3*x+1] = g;
     this->data[y][3*x+2] = b;
   }
+
+	// Update this Palette by disjunction relation with another palette
+	// return true if succeeded
+	bool union_with(Palette &pal) {
+		// check requirements
+		if(this->width != pal.width || this->height != pal.height) return false;
+		
+		// union
+		for(int i=0;i<this->height;i++) {
+			for(int j=0;j<width*3;j++) {
+				this->data[i][j] |= pal.data[i][j];
+			}
+		}
+
+		return true;
+	}
 };
 
 void writeImage(const char *filename, Palette &pal) {
