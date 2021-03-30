@@ -3,6 +3,7 @@
 // author: Jiman Hwang(molehair a.t kaist.ac.kr)
 
 #include <iRRAM/lib.h>
+#include <vector>
 #include "euclidean.hpp"
 #include "plot.hpp"
 
@@ -22,7 +23,10 @@ namespace iRRAM {
 // R^N
 template <int N>
 class Compact {
-protected:
+private:
+  // disjunction list
+  std::vector<Compact<N>> disj;
+  
   // characteristic function
   std::function< bool (Point<N> , int) > cfun;
 
@@ -46,7 +50,18 @@ public:
   *
   *  @return the result of calling the characteristic function with \p point and \p p
   */
-  virtual bool member(Point<N> point, int p) { return this->cfun(point, p); }
+  virtual bool member(Point<N> point, int p) {
+    // belong to the current characteristic function?
+    if(this->cfun(point, p)) return true;
+
+    // and unions?
+    for(Compact<N> &com : disj) {
+      if(com.member(point, p)) return true;
+    }
+
+    // no membership
+    return false;
+  }
 
 
   /** Save the 2D graph to an .png file
@@ -55,41 +70,69 @@ public:
   * 
   *  Height will be determined automatically.
   *
+  *  @param pal image container
   *  @param width the image width in pixel
   *  @param p precision(higher \p p → higher precision)
   * 
+  *  @warning REQUIRE: \p pal must be uninitialized.
   *  @warning REQUIRE: \p x1 < \p x2, \p y1 < \p y2
   */
-  virtual void plot2D(const char *filename, int width, DYADIC x1, DYADIC y1, DYADIC x2, DYADIC y2) {
+  virtual void plot2D(Palette &pal, int width, DYADIC x1, DYADIC y1, DYADIC x2, DYADIC y2) {
     // only plane
-    if(N != 2) return;
+    assert(N==2);
+    
+    // need an uninitialized palette
+    assert(pal.width==0);
 
-    // some values..
+    // some values
     REAL pixelSize = (x2-x1)/REAL(width);      // single pixel size as a rect
     int height = ceil(((y2-y1)/pixelSize).as_double());               // image height
 
+    // plot the current chracteristic function
+    pal.init(width, height);
+    _plot2D_this(pal, x1, y1, x2, y2);
+
+    // plot unions for each 'disj' and merge(?)
+    for(Compact<N> &com : disj) {
+      Palette palDisj;
+      com.plot2D(palDisj, width, x1, y1, x2, y2);
+      pal.union_with(palDisj);
+    }
+  }
+
+  /** Update this compact set in disjunction with another one
+   * 
+  *  @param com the compact set with which union
+  */
+  void union_with(Compact<N> &com) {
+    disj.push_back(com);
+  }
+
+private:
+  // plot this->cfunc
+  // manually check membership for each pixel
+  virtual void _plot2D_this(Palette &pal, DYADIC &x1, DYADIC &y1, DYADIC &x2, DYADIC &y2) {
+    // some values..
+    REAL pixelSize = (x2-x1)/REAL(pal.width);      // single pixel size as a rect
+
     // precision
-    int p = floor((REAL(0.5) - log(pixelSize)/ln2()).as_double());
+    int p = floor((RATIONAL(1,2) - log(pixelSize)/ln2()).as_double());
 
     // plot each pixel to palette
     // start at the bottom row, from left to right.. row += 1 .. repeat
     // variable point stores the coordinate of the center of the current pixel
     Point<N> point = {REAL(0), y1 - pixelSize/2};      // init with coordinate outside image
-    Palette pal(width, height);
-    for(int i=height-1 ; i>=0 ; i--) {
+    for(int i=pal.height-1 ; i>=0 ; i--) {
       point[0] = x1 + pixelSize/2;    // x; the left most pixel
       point[1] += pixelSize;          // y; +1 row
 
-      for(int j=0 ; j<width ; j++) {
+      for(int j=0 ; j<pal.width ; j++) {
         if(member(point, p)) {
           pal.setColor(j, i, PLOT_COLOR_R, PLOT_COLOR_G, PLOT_COLOR_B);
         }
         point[0] += pixelSize;
       }
     }
-
-    // to image
-    writeImage(filename, pal);
   }
 };
 /** @} */
