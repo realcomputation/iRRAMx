@@ -756,8 +756,8 @@ namespace internal{template <> struct is_continuous<cvec_wrap > : public std::tr
 
 
 
-std::vector<COMPLEX> roots(POLYNOMIAL P){
-  std::string r = "";
+std::vector<COMPLEX> roots(const POLYNOMIAL& P){
+  std::string r;
 
   // return limit_mv<std::vector<COMPLEX> >(root_approximation_newton, r, P);
   cvec_wrap t = limit_mv_<cvec_wrap >(root_approximation_newton, r, P);

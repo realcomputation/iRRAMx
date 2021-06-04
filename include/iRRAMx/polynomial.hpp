@@ -46,7 +46,7 @@ class POLYNOMIAL
 			@param d a degree of the created polynomial
 			@param c an array of coefficient where c[i] is the coef. of z^i
 		*/
-		POLYNOMIAL(int d, std::vector<COMPLEX> c);
+		POLYNOMIAL(int d, const std::vector<COMPLEX> &c);
 
 		//! construction of a constant polynomial
 		/*!
@@ -56,11 +56,15 @@ class POLYNOMIAL
 		POLYNOMIAL();
 		~POLYNOMIAL();
 		COMPLEX operator () (const COMPLEX&);
+
+		friend orstream &operator<<(orstream &ors, const POLYNOMIAL &p);
 };
 
 POLYNOMIAL operator + (const POLYNOMIAL&, const POLYNOMIAL&);
 POLYNOMIAL operator - (const POLYNOMIAL&, const POLYNOMIAL&);
 POLYNOMIAL operator * (const POLYNOMIAL&, const POLYNOMIAL&);
+POLYNOMIAL operator * (const COMPLEX&, const POLYNOMIAL&);
+POLYNOMIAL operator * (const POLYNOMIAL&, const COMPLEX&);
 
 namespace internal{template <> struct is_continuous<POLYNOMIAL> : public std::true_type{};}
 // void geterror(const POLYNOMIAL &);
@@ -93,12 +97,28 @@ COMPLEX evaluate(POLYNOMIAL p, COMPLEX x);
  *
  *  @return p^{(k)}(z)/k!
  */
-COMPLEX CoefAt(POLYNOMIAL p, int k, COMPLEX z);
+COMPLEX CoefAt(POLYNOMIAL p, int k, const COMPLEX& z);
 // Translation and dilation by g(x) = f(ax + b)
 // a : REAL, b : COMPLEX
-POLYNOMIAL translation(POLYNOMIAL , REAL , COMPLEX );
+POLYNOMIAL translation(const POLYNOMIAL& , const REAL& , const COMPLEX& );
 
 
+/*! @brief compute a power of the polynomial
+ *
+ *
+ *
+ *  @return p^n
+ */
+POLYNOMIAL power(const POLYNOMIAL &p, int n);
+
+
+/*! @brief compute a composition of two polynomials
+ *
+ *
+ *
+ * @return p(q(x))
+ */
+POLYNOMIAL composite(const POLYNOMIAL &p, const POLYNOMIAL &q);
 
 // Find root
 /*! @brief find every roots of a polynomial
@@ -107,7 +127,7 @@ POLYNOMIAL translation(POLYNOMIAL , REAL , COMPLEX );
  *
  *  @return a vector of all roots of p
  */
-std::vector<COMPLEX > roots(POLYNOMIAL p);
+std::vector<COMPLEX > roots(const POLYNOMIAL& p);
 
 /** @} */
 
