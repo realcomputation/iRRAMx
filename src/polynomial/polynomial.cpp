@@ -64,7 +64,7 @@ POLYNOMIAL::POLYNOMIAL(int d, const std::vector<COMPLEX> &v)
 	co.reserve(d+1);
 	for (int i = 0; i<d+1; i++)
 	{
-		co.push_back(v[i]);
+		co.emplace_back(v[i]);
 	}
 	degree = d;
 	coef = co;
@@ -90,7 +90,7 @@ POLYNOMIAL::~POLYNOMIAL()
 }
 
 
-COMPLEX POLYNOMIAL::operator () (const COMPLEX& z)
+COMPLEX POLYNOMIAL::operator () (const COMPLEX& z) const
 {
 	COMPLEX fx = COMPLEX(0,0);
 	for(int i=0; i < degree + 1; i++)
@@ -205,7 +205,7 @@ POLYNOMIAL operator * (const POLYNOMIAL &p, const COMPLEX &c) {
 }
 
 
-COMPLEX evaluate(POLYNOMIAL P, COMPLEX z)
+COMPLEX evaluate(const POLYNOMIAL& P, const COMPLEX& z)
 {
 	COMPLEX fx = COMPLEX(0,0);
 	for(int i=0;i<P.degree + 1;i++)

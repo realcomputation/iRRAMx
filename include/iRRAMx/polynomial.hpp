@@ -55,7 +55,7 @@ class POLYNOMIAL
 		POLYNOMIAL(COMPLEX c);
 		POLYNOMIAL();
 		~POLYNOMIAL();
-		COMPLEX operator () (const COMPLEX&);
+		COMPLEX operator () (const COMPLEX&) const;
 
 		friend orstream &operator<<(orstream &ors, const POLYNOMIAL &p);
 };
@@ -88,7 +88,7 @@ POLYNOMIAL deriv(POLYNOMIAL p, int k);
  *
  *  @return p(x)
  */
-COMPLEX evaluate(POLYNOMIAL p, COMPLEX x);
+COMPLEX evaluate(POLYNOMIAL p, const COMPLEX& x);
 // Taylor coefficients: a_k = CoefAt(P, k, z) := P^{(k)}(z)/k!
 
 /*! @brief compute Taylor coefficient
