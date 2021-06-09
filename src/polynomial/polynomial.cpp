@@ -51,20 +51,20 @@ POLYNOMIAL::POLYNOMIAL(int d, COMPLEX* c)
 	co.reserve(d+1);
 	for (int i = 0; i<d+1; i++)
 	{
-		co.push_back(c[i]);
+		co.emplace_back(c[i]);
 	}
 	degree = d;
 	coef = co;
 }
 
 
-POLYNOMIAL::POLYNOMIAL(int d, std::vector<COMPLEX> v)
+POLYNOMIAL::POLYNOMIAL(int d, const std::vector<COMPLEX> &v)
 {
 	std::vector<COMPLEX> co;
 	co.reserve(d+1);
 	for (int i = 0; i<d+1; i++)
 	{
-		co.push_back(v[i]);
+		co.emplace_back(v[i]);
 	}
 	degree = d;
 	coef = co;
@@ -74,7 +74,7 @@ POLYNOMIAL::POLYNOMIAL(COMPLEX x)
 {
 	std::vector<COMPLEX> co;
 	co.reserve(1);
-	co.push_back(x);
+	co.emplace_back(std::move(x));
 	degree = 0;
 	coef = co;
 }
@@ -90,12 +90,20 @@ POLYNOMIAL::~POLYNOMIAL()
 }
 
 
-COMPLEX POLYNOMIAL::operator () (const COMPLEX& z)
+COMPLEX POLYNOMIAL::operator () (const COMPLEX& z) const
 {
 	COMPLEX fx = COMPLEX(0,0);
 	for(int i=0; i < degree + 1; i++)
 		fx = fx + power(z,i) * coef[i];
 	return fx;
+}
+
+orstream &operator<<(orstream &ors, const POLYNOMIAL &p) {
+    for(int i = 0; i <= p.degree; i++) {
+        ors << real(p.coef[i]) << "\t+\t" << imag(p.coef[i]) << "\ti\tx^" << i;
+        if(i != p.degree) ors << "\n";
+    }
+    return ors;
 }
 
 POLYNOMIAL operator + (const POLYNOMIAL& P , const POLYNOMIAL& Q)
@@ -179,7 +187,25 @@ POLYNOMIAL operator * (const POLYNOMIAL& P, const POLYNOMIAL& Q)
 }
 
 
-COMPLEX evaluate(POLYNOMIAL P, COMPLEX z)
+POLYNOMIAL operator * (const COMPLEX &c, const POLYNOMIAL &p) {
+    POLYNOMIAL res(p.degree, p.coef);
+    for(auto &now : res.coef) {
+        now = now * c;
+    }
+    return res;
+}
+
+
+POLYNOMIAL operator * (const POLYNOMIAL &p, const COMPLEX &c) {
+    POLYNOMIAL res(p.degree, p.coef);
+    for(auto &now : res.coef) {
+        now = now * c;
+    }
+    return res;
+}
+
+
+COMPLEX evaluate(const POLYNOMIAL& P, const COMPLEX& z)
 {
 	COMPLEX fx = COMPLEX(0,0);
 	for(int i=0;i<P.degree + 1;i++)
@@ -222,7 +248,7 @@ POLYNOMIAL deriv(POLYNOMIAL P, int k)
 }
 
 // kth taylor coefficient of P at z
-COMPLEX CoefAt(POLYNOMIAL P, int k, COMPLEX z)
+COMPLEX CoefAt(POLYNOMIAL P, int k, const COMPLEX& z)
 {
 	COMPLEX tmp[P.degree+1];
 	for(int i=0; i<P.degree + 1; i++)
@@ -245,7 +271,7 @@ COMPLEX CoefAt(POLYNOMIAL P, int k, COMPLEX z)
 }
 
 // translation and dilation by g(x) = f(a + bx)
-POLYNOMIAL translation(POLYNOMIAL P, REAL a, COMPLEX b)
+POLYNOMIAL translation(const POLYNOMIAL& P, const REAL& a, const COMPLEX& b)
 {
 	COMPLEX C[P.degree +1];
 	for(int i=0; i<P.degree + 1; i++)
@@ -257,6 +283,31 @@ POLYNOMIAL translation(POLYNOMIAL P, REAL a, COMPLEX b)
 }
 
 
+// power of the polynomial
+POLYNOMIAL power(const POLYNOMIAL &p, int n) {
+    assert(n >= 0);
+    if(n == 0) {
+        COMPLEX c(REAL(1), REAL(0));
+        return POLYNOMIAL(0, &c);
+    }
+    if(n == 1) return p;
+    auto r = power(p, n / 2);
+    return r * r * power(p, n % 2);
+}
+
+
+// composition of the polynomial
+POLYNOMIAL composite(const POLYNOMIAL &p, const POLYNOMIAL &q) {
+    COMPLEX c(REAL(0));
+    POLYNOMIAL res(0, &c);
+    c = COMPLEX(REAL(1));
+    POLYNOMIAL Q(0, &c);
+    for(int i = 0; i <= p.degree; i++) {
+        res = res + p.coef[i] * Q;
+        if(i != p.degree) Q = Q * q;
+    }
+    return res;
+}
 
 /*
 
