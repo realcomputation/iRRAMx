@@ -441,45 +441,60 @@ Newton(POLYNOMIAL P, COMPONENT C, REAL epsilon)
 std::vector< COMPONENT >
 Bisect(POLYNOMIAL P, COMPONENT Comp)
 {
-	COMPONENT C;
-	std::vector< COMPONENT > U, J;
-	R_CLOSEDBOX B;
+  COMPONENT C;
+  std::vector< COMPONENT > U, J;
+  R_CLOSEDBOX B;
 
-	int flg;
-	bool specialflg = true;
+  int flg;
+  bool specialflg = true;
 
-	C = Comp.split();  //C.depth ++
+  C = Comp.split();  //C.depth ++
 
-	for (int i =0; i< C.size(); i++)
+  for (int i =0; i< C.size(); i++)
+    {
+      B = C[i];
+      if (softGTest(P,0, R_OPENDISC(B)) == false)
 	{
-		B = C[i];
-		if (softGTest(P,0, R_OPENDISC(B)) == false)
-		{
-      COMPONENT T = COMPONENT(B);
-      T.depth = C.depth;
-      U.push_back(T);
+	  COMPONENT T = COMPONENT(B);
+	  T.depth = C.depth;
+	  print(T);
+
+	  U.push_back(T);
+	}
+      // else
+      // 	{
+      // 	  COMPONENT T = COMPONENT(B);
+      // 	  T.depth = C.depth;
+      // 	  cout <<"no root in \n";
+      // 	  print(T);	  
+      // 	}
+      
     }
-  }
 
 
   std::vector<int> rm_idx;
   for (int i = 0; i<U.size(); i++)
-    for (int j = i+1; j<U.size(); j++){
-      if(adj(U[i], U[j])){
-        for (int k = 0; k < U[i].size(); k++)
-          U[j].add(U[i][k]);
-        rm_idx.push_back(i);
-        break;
+    for (int j = i+1; j<U.size(); j++)
+      {
+	if(adj(U[i], U[j]))
+	  {
+	    for (int k = 0; k < U[i].size(); k++)
+	      U[j].add(U[i][k]);
+	    rm_idx.push_back(i);
+	    break;
+	  }
       }
-    }
 
 
 
   int tind = 0;
   if (rm_idx.size() > 0){
-    for (int i = 0; i<U.size(); i++){
-      if(tind < rm_idx.size()){
-        if(i == rm_idx[tind]){
+    for (int i = 0; i<U.size(); i++)
+      {
+      if(tind < rm_idx.size())
+	{
+        if(i == rm_idx[tind])
+	  {
           tind+=1;
         }
         else{
@@ -492,21 +507,29 @@ Bisect(POLYNOMIAL P, COMPONENT Comp)
     }
   }
 
-	if ((int)J.size() ==1)
-		specialflg = false;
-
-	for (int i=0; i<(int)J.size(); i++)
+  if (rm_idx.size() == 0)
+    {
+      for (int i = 0; i<U.size(); i++)
 	{
-		if (specialflg)
-			J[i].Nc = 4;
-		else
-			if (sqrt(C.Nc) > 4)
-				J[i].Nc = sqrt(C.Nc);
-			else
-				J[i].Nc = 4;
+	  J.push_back(U[i]);
 	}
+      }
 
-	return J;
+  if ((int)J.size() ==1)
+    specialflg = false;
+
+  for (int i=0; i<(int)J.size(); i++)
+    {
+      if (specialflg)
+	J[i].Nc = 4;
+      else
+	if (sqrt(C.Nc) > 4)
+	  J[i].Nc = sqrt(C.Nc);
+	else
+	  J[i].Nc = 4;
+    }
+
+  return J;
 }
 
 template <typename Out>
@@ -534,143 +557,132 @@ REAL dist(R_COMPLEX a, R_COMPLEX b){
 cvec_wrap
 root_approximation_newton(int p, std::string& choice, const POLYNOMIAL& Q){
 
-  // std::cout <<"\nhelo\n";
   POLYNOMIAL P = Q;
-	int n = P.degree;
+  int n = P.degree;
 
-	/*
-		COMPUTING ROOT BOUND
-	*/
-	R_OPENDISC D = R_OPENDISC(R_COMPLEX(0,0),1);
-	while(!softGTest(P, P.degree, D))
-	{
-		D = D.multiply(2);
-	}
-
-
-	std::vector< COMPONENT > Q_out, Q_main;
-	std::vector< COMPONENT > bisect_result;
-    // std::priority_queue<COMPONENT , std::vector<COMPONENT >, component_wider> Q_main;
-
-
-	COMPONENT C = COMPONENT(R_CLOSEDBOX(D.center, D.radius*2));
-	C.Nc = 4;
-	Q_main.push_back(C);
-	COMPONENT Cprime;
-
-	REAL epsilon = prec(p);
-
-
-	int pi;
-
-	RATIONAL tmp, qtmp;
-	COMPONENT tc;
-
-
-	int fll;
-	while(!Q_main.empty())
-	{
-    // std::cout<<"A\n";
-
-// 		Swap Q1[end -1] <-> Q1[max wc]
-		pi = 0;
-		qtmp = 0;
-		tmp = 0;
-		for(int i=0; i< (int) Q_main.size(); i++)
-		{
-			qtmp = Q_main[i].Wc();
-			if (qtmp > tmp)
-			{
-				pi = i;
-				tmp = qtmp;
-			}
-		}
-
-    // std::cout<<"B\n";
-
-		tc = Q_main[pi];
-		Q_main[pi] = Q_main[(int) Q_main.size() - 1];
-		Q_main[(int) Q_main.size() -1] = tc;
-// 		swap done
-// std::cout<<"C\n";
-
-
-		C = Q_main.back();
-		Q_main.pop_back();
-    // std::cout<<"===\n";
-		// printr(C);
-    // if (C.is_empty()) std::cout<<"is empty omg! \n";
-    //
-    // std::cout<<"===\n";
-		fll = 0;
-		R_OPENDISC II = R_OPENDISC(C.Mc(),C.Rc());
-
-    // std::cout<<"D\n";
-
-
-    // printr(C);
-		for(int i=0; i< (int) Q_main.size(); i++)
-		{
-			if(intersect(R_OPENDISC(Q_main[i].Mc(), Q_main[i].Rc()), II.multiply(4)))
-			{
-				fll = 1;
-				break;
-			}
-		}
-    // std::cout << std::to_string(fll) <<"\n";
-    // std::cout<<"E\n";
-		if (fll == 0)
-		{
-			C.kc = softGStar(P, II, P.degree);
-      // print(C);
-			if(C.kc >0)
-			{
-				if(choose(C.Wc() > epsilon / 2, C.Wc() < epsilon ) == 1)
-				{
-					Cprime= Newton(P,C,epsilon);
-
-					if(Cprime.is_empty() == false)
-					{
-						// std::cout <<" newton worked\n";
-						Q_main.push_back(Cprime);
-						continue;
-					}
-				}
-				else if (C.Wc() <= 3 * C.wc())
-				{
-          // std::cout <<"adding"<<"\n";
-          // std::cout <<"adding"<<"\n";
-          // std::cout <<"adding"<<"\n";
-          // printr(C);
-					Q_out.push_back(C);
-					continue;
-				}
-			}
-		}
-    // std::cout<<"F\n";
-
-    // std::cout <<"bisection start!\n";
-    // print(C);
-    // std::cout <<"reduces to!\n";
-		bisect_result = Bisect(P,C);
-		for(int i=0; i<(int)bisect_result.size(); i++){
-      Q_main.push_back(bisect_result[i]);
-      // print(bisect_result[i]);
-      // std::cout<<"---\n";
+  /*
+    COMPUTING ROOT BOUND
+  */
+  R_OPENDISC D = R_OPENDISC(R_COMPLEX(0,0),1);
+  while(!softGTest(P, P.degree, D))
+    {
+      D = D.multiply(2);
     }
-    // std::cout<<"G\n";
 
 
+  std::vector< COMPONENT > Q_out, Q_main;
+  std::vector< COMPONENT > bisect_result;
+
+  COMPONENT C = COMPONENT(R_CLOSEDBOX(D.center, D.radius*2));
+  C.Nc = 4;
+  Q_main.push_back(C);
+  COMPONENT Cprime;
+
+  REAL epsilon = prec(p);
+
+  int pi;
+
+  RATIONAL tmp, qtmp;
+  COMPONENT tc;
+
+
+  int fll;
+  while(!Q_main.empty())
+    {
+
+      // Swap Q1[end -1] <-> Q1[max wc]
+      pi = 0;
+      qtmp = 0;
+      tmp = 0;
+      for(int i=0; i< (int) Q_main.size(); i++)
+	{
+	  qtmp = Q_main[i].Wc();
+	  if (qtmp > tmp)
+	    {
+	      pi = i;
+	      tmp = qtmp;
+	    }
 	}
 
-  // std::cout<<"doneeeeeeeee\n";
-	std::vector< R_COMPLEX > roots;
-	for (int i =0; i<(int) Q_out.size(); i++)
-		for (int j=0; j< Q_out[i].kc; j++)
-			roots.push_back(Q_out[i].Mc());
+      tc = Q_main[pi];
+      Q_main[pi] = Q_main[(int) Q_main.size() - 1];
+      Q_main[(int) Q_main.size() -1] = tc;
+      // swap done
 
 
-// CHECK M-cache
+      C = Q_main.back();
+      Q_main.pop_back();
+      fll = 0;
+      R_OPENDISC II = R_OPENDISC(C.Mc(),C.Rc());
+
+      for(int i=0; i< (int) Q_main.size(); i++)
+	{
+	  if(intersect(R_OPENDISC(Q_main[i].Mc(), Q_main[i].Rc()), II.multiply(4)))
+	    {
+	      fll = 1;
+	      break;
+	    }
+	}
+
+      if (fll == 0)
+	{
+	  C.kc = softGStar(P, II, P.degree);
+
+	  if(C.kc >0)
+	    {
+	      if(choose(C.Wc() > epsilon / 2, C.Wc() < epsilon ) == 1)
+		{
+		  Cprime= Newton(P,C,epsilon);
+
+		  if(Cprime.is_empty() == false)
+		    {
+		      // std::cout <<" ==== \n";
+		      // printr(C);
+		      // std::cout <<" newton worked\n";
+		      Q_main.push_back(Cprime);
+		      continue;
+		    }
+		}
+	      else if (C.Wc() <= 3 * C.wc())
+		{
+		  // std::cout <<" ==== \n";
+		  // printr(C);
+		  // std::cout <<" adding to q out\n";
+				    
+		  Q_out.push_back(C);
+		  continue;
+		}
+	    }
+	}
+      // std::cout<<"F\n";
+
+      // std::cout <<"bisection start!\n";
+      // print(C);
+      // std::cout <<"reduces to!\n";
+      bisect_result = Bisect(P,C);
+      for(int i=0; i<(int)bisect_result.size(); i++){
+	Q_main.push_back(bisect_result[i]);
+	// print(bisect_result[i]);
+	// std::cout<<"---\n";
+      }
+      // std::cout<<"G\n";
+		
+		
+    }
+
+  // std::cout<<"\n\n doneeeeeeeee\n";
+  std::vector< R_COMPLEX > roots;
+  for (int i =0; i<(int) Q_out.size(); i++)
+    for (int j=0; j< Q_out[i].kc; j++)
+      {
+	// print(Q_out[i]);
+	roots.push_back(Q_out[i].Mc());
+	// std::cout <<"haha!\n";
+      }
+
+
+	
+  // CHECK M-cache
 
   std::vector< R_COMPLEX> ordered_roots;
   if (choice == ""){
@@ -696,11 +708,11 @@ root_approximation_newton(int p, std::string& choice, const POLYNOMIAL& Q){
     for(int i = 0; i<cached_roots.size(); i ++){
       for(int j = 0; j<roots.size(); j ++){
         if(dist(cached_roots[i], roots[j]) < prec(cached_prec) + prec(p))
-        {
-          ordered_roots.push_back(roots[j]);
-          roots.erase(roots.begin() + j);
-          break;
-        }
+	  {
+	    ordered_roots.push_back(roots[j]);
+	    roots.erase(roots.begin() + j);
+	    break;
+	  }
       }
     }
 
@@ -715,9 +727,9 @@ root_approximation_newton(int p, std::string& choice, const POLYNOMIAL& Q){
 
   std::vector<COMPLEX> croots;
   for (int i = 0; i < ordered_roots.size(); i++)
-  {
-    croots.push_back(COMPLEX(REAL(ordered_roots[i].real()), REAL(ordered_roots[i].imag())));
-  }
+    {
+      croots.push_back(COMPLEX(REAL(ordered_roots[i].real()), REAL(ordered_roots[i].imag())));
+    }
 
 
   // return croots;
