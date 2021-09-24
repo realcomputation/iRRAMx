@@ -103,7 +103,7 @@ class R_OPENDISC
 
 		R_OPENDISC();
 		R_OPENDISC(R_COMPLEX, RATIONAL);
-		R_OPENDISC(R_CLOSEDBOX);
+		R_OPENDISC(const R_CLOSEDBOX&);
 		~R_OPENDISC();
 
 		R_OPENDISC multiply(RATIONAL) const;
@@ -144,6 +144,7 @@ FUNCTIONS:
 
 class COMPONENT
 {
+    bool initialized;
 	public:
 		std::vector<R_CLOSEDBOX> box_list;
 
@@ -161,7 +162,7 @@ class COMPONENT
 		COMPONENT(R_CLOSEDBOX );
 		~COMPONENT();
 
-		void add(R_CLOSEDBOX );
+		void add(const R_CLOSEDBOX& );
 
 		int size() const;
 		RATIONAL Wc() const;
@@ -174,12 +175,12 @@ class COMPONENT
 
 };
 
-LAZY_BOOLEAN constains (OPENDISC, R_CLOSEDBOX);
-LAZY_BOOLEAN is_in (COMPONENT, COMPLEX);
-bool intersect(R_OPENDISC , R_OPENDISC );
-bool comp_disc_intersect(COMPONENT, R_OPENDISC );
-bool adj(COMPONENT , R_CLOSEDBOX );
-bool adj(COMPONENT , COMPONENT );
+LAZY_BOOLEAN constains (const OPENDISC&, const R_CLOSEDBOX&);
+LAZY_BOOLEAN is_in (const COMPONENT&, const COMPLEX&);
+bool intersect(const R_OPENDISC& , const R_OPENDISC& );
+bool comp_disc_intersect(const COMPONENT&, const R_OPENDISC& );
+bool adj(const COMPONENT& , const R_CLOSEDBOX& );
+bool adj(const COMPONENT& , const COMPONENT& );
 void print(COMPONENT);
 void printr(COMPONENT);
 

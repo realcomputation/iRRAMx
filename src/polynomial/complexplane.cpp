@@ -25,8 +25,8 @@ CLOSEDBOX::CLOSEDBOX()
 
 CLOSEDBOX::CLOSEDBOX(COMPLEX c, REAL r)
 {
-	center = c;
-	width = r;
+	center = std::move(c);
+	width = std::move(r);
 	depth = 1;
 }
 CLOSEDBOX::~CLOSEDBOX()
@@ -65,8 +65,8 @@ OPENDISC::OPENDISC()
 
 OPENDISC::OPENDISC(COMPLEX c, REAL r)
 {
-	center = c;
-	radius = r;
+	center = std::move(c);
+	radius = std::move(r);
 }
 
 OPENDISC::OPENDISC(CLOSEDBOX B)
@@ -100,8 +100,8 @@ R_CLOSEDBOX::R_CLOSEDBOX()
 
 R_CLOSEDBOX::R_CLOSEDBOX(R_COMPLEX c, RATIONAL r)
 {
-	center = c;
-	width = r;
+	center = std::move(c);
+	width = std::move(r);
 	depth = 1;
 	id = "0";
 }
@@ -144,11 +144,11 @@ R_OPENDISC::R_OPENDISC()
 
 R_OPENDISC::R_OPENDISC(R_COMPLEX c, RATIONAL r)
 {
-	center = c;
-	radius = r;
+	center = std::move(c);
+	radius = std::move(r);
 }
 
-R_OPENDISC::R_OPENDISC(R_CLOSEDBOX B)
+R_OPENDISC::R_OPENDISC(const R_CLOSEDBOX& B)
 {
 	center = B.center;
 	radius = B.width * 3 / 4;
@@ -167,6 +167,7 @@ R_OPENDISC  R_OPENDISC::multiply(RATIONAL f) const
 COMPONENT::COMPONENT()
 {
 	depth = 0;
+	initialized = false;
 }
 
 COMPONENT::COMPONENT(R_CLOSEDBOX B)
@@ -177,30 +178,40 @@ COMPONENT::COMPONENT(R_CLOSEDBOX B)
 	left_most  = B.center.real() - B.width / 2;
 	right_most_box = B;
 	box_list.push_back(B);
+	initialized = true;
 }
 
 COMPONENT::~COMPONENT(){}
 
-void COMPONENT::add(R_CLOSEDBOX B)
+void COMPONENT::add(const R_CLOSEDBOX &B)
 {
-	RATIONAL upper_most_ = B.center.imag() + B.width / 2;
-	RATIONAL right_most_ = B.center.real() + B.width / 2;
-	RATIONAL below_most_ = B.center.imag() - B.width / 2;
-	RATIONAL left_most_  = B.center.real() - B.width / 2;
+    if(initialized) {
+        RATIONAL upper_most_ = B.center.imag() + B.width / 2;
+        RATIONAL right_most_ = B.center.real() + B.width / 2;
+        RATIONAL below_most_ = B.center.imag() - B.width / 2;
+        RATIONAL left_most_  = B.center.real() - B.width / 2;
 
-	if (upper_most_ > upper_most)
-		upper_most = upper_most_;
-	if (right_most_ > right_most)
-	{
-		right_most = right_most_;
-		right_most_box = B;
-	}
-	if (below_most_ < below_most)
-		below_most = below_most_;
-	if (left_most_ < left_most)
-		left_most = left_most_;
+        if (upper_most_ > upper_most)
+            upper_most = upper_most_;
+        if (right_most_ > right_most)
+        {
+            right_most = right_most_;
+            right_most_box = B;
+        }
+        if (below_most_ < below_most)
+            below_most = below_most_;
+        if (left_most_ < left_most)
+            left_most = left_most_;
+    }
+    else {
+        upper_most = B.center.imag() + B.width / 2;
+        right_most = B.center.real() + B.width / 2;
+        below_most = B.center.imag() - B.width / 2;
+        left_most = B.center.real() - B.width / 2;
+        initialized = true;
+    }
 
-	box_list.push_back(B);
+    box_list.push_back(B);
 }
 
 int COMPONENT::size() const
@@ -230,7 +241,7 @@ RATIONAL COMPONENT::Rc() const
 
 bool COMPONENT::is_empty() const
 {
-	return box_list.size() == 0 ;
+	return box_list.empty();
 }
 
 COMPONENT COMPONENT::split() const
@@ -241,7 +252,12 @@ COMPONENT COMPONENT::split() const
 	N.kc = kc;
 	N.depth = depth;
 
-	for(int i=0; i < (int)box_list.size(); i++)
+    N.upper_most = upper_most;
+    N.right_most = right_most;
+    N.below_most = below_most;
+    N.left_most = left_most;
+
+	for(int i = 0; i < (int)box_list.size(); i++)
 	{
 		for(int p=1; p<5; p++)
 			N.add(box_list[i].subdivide(p));
@@ -257,7 +273,7 @@ R_CLOSEDBOX COMPONENT::operator [](int i) const
 	return box_list[i];
 }
 
-LAZY_BOOLEAN constains (OPENDISC D, R_CLOSEDBOX B)
+LAZY_BOOLEAN constains (const OPENDISC& D, const R_CLOSEDBOX& B)
 {
 	return imag(D.center) + D.radius < B.center.imag() + B.width/2 &&
 			imag(D.center) - D.radius > B.center.imag() - B.width/2 &&
@@ -266,7 +282,7 @@ LAZY_BOOLEAN constains (OPENDISC D, R_CLOSEDBOX B)
 
 }
 
-LAZY_BOOLEAN is_in (COMPONENT C, COMPLEX x)
+LAZY_BOOLEAN is_in (const COMPONENT& C, const COMPLEX& x)
 {
 	for (int i=0; i < C.size(); i++)
 	{
@@ -281,7 +297,7 @@ LAZY_BOOLEAN is_in (COMPONENT C, COMPLEX x)
 
 
 
-bool intersect(R_OPENDISC A, R_OPENDISC B)
+bool intersect(const R_OPENDISC& A, const R_OPENDISC& B)
 {
 	return (A.center.real() - B.center.real()) * (A.center.real() - B.center.real()) +
 	 (A.center.imag() - B.center.imag()) * (A.center.imag() - B.center.imag())
@@ -289,13 +305,13 @@ bool intersect(R_OPENDISC A, R_OPENDISC B)
 }
 
 
-bool intersect(R_CLOSEDBOX A, R_CLOSEDBOX B)
+bool intersect(const R_CLOSEDBOX& A, const R_CLOSEDBOX& B)
 {
 	return maximum(abs(A.center.real() - B.center.real()), abs(A.center.imag() - B.center.imag())) <= (A.width+B.width) / 2;
 }
 
 
-bool comp_disc_intersect(COMPONENT C, R_OPENDISC D)
+bool comp_disc_intersect(const COMPONENT& C, const R_OPENDISC& D)
 {
 	for (int i=0; i<C.size(); i++)
 		if (intersect(C[i], D))
@@ -303,12 +319,12 @@ bool comp_disc_intersect(COMPONENT C, R_OPENDISC D)
 	return false;
 }
 
-bool adj(R_CLOSEDBOX A, R_CLOSEDBOX B)
+bool adj(const R_CLOSEDBOX& A, const R_CLOSEDBOX& B)
 {
 	return maximum(abs(A.center.real() - B.center.real()), abs(A.center.imag() - B.center.imag())) == (A.width+B.width) / 2;
 }
 
-bool adj(COMPONENT C, R_CLOSEDBOX I)
+bool adj(const COMPONENT& C, const R_CLOSEDBOX& I)
 {
 	for (int i=0; i<C.size(); i++)
 		if (adj(C[i], I))
@@ -316,7 +332,7 @@ bool adj(COMPONENT C, R_CLOSEDBOX I)
 	return false;
 }
 
-bool adj(COMPONENT C, COMPONENT I)
+bool adj(const COMPONENT& C, const COMPONENT& I)
 {
 	for (int i=0; i<C.size(); i++)
 		if (adj(I, C[i]))
